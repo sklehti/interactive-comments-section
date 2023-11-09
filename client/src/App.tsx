@@ -1,27 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { AllUsers } from "./types";
+import { AllUsers, Comments, Replies } from "./types";
 import "./styles.css";
 import axios from "axios";
 import { getAllUsers } from "./services/usersCommentServices";
+import AllComments from "./components/AllComments";
+import { CurrentUser } from "../../server/src/types";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<AllUsers[]>([]);
+  const [allComments, setAllComments] = useState<Comments[]>([]);
 
   useEffect(() => {
     getAllUsers.then((response) => {
       setCurrentUser(response);
+      console.log(response);
+      setAllComments(response[0].comments);
     });
   }, []);
 
+  console.log(allComments);
+
   return (
-    <div>
-      {/* TODO: don't show currentUser here. This is just a test */}
-      {currentUser.map((u, index) => (
-        <div key={index}>
-          <img src={require(`${u.currentUser.image.png}`)} />
-          {u.currentUser.username}
-        </div>
-      ))}
+    <div className="app">
+      <AllComments allComments={allComments} currentUser={currentUser} />
     </div>
   );
 }
