@@ -11,19 +11,30 @@ export interface CurrentUser {
 }
 
 export interface Comments {
-  id: number;
   content: string;
   createdAt: string;
   score?: number;
-  user?: User;
-  replies: Replies[];
+  // user?: User;
+  username: string;
+  image_png: string;
+  image_webp: string;
+  // replies?: Replies[];
+  comment_id: number;
+  replies: number;
+}
+
+export interface UserInfo {
+  username: string;
+  image_png: string;
+  image_webp: string;
+  admin: number;
+  user_id: number;
 }
 
 export interface User {
   username: string;
   image?: Image;
 }
-
 export interface Image {
   png: string;
   webp: string;
@@ -34,6 +45,10 @@ export interface Replies {
   content?: string;
   score?: number;
   createdAt?: string;
-  user?: User;
+  user?: User; // TODO: muuta tämä sellaiseksi joka tuo nimen ja kuvan!
+  // user_id: number;
   replyingTo: string;
+  comment_id: number;
+  username: string;
+  image_png: string;
 }

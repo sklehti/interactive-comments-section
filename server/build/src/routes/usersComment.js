@@ -9,6 +9,15 @@ const router = express_1.default.Router();
 router.get("/", (_req, res) => {
     res.send(usersCommentsService_1.default.getEntries());
 });
+router.get("/:username", (req, res) => {
+    const rightUser = usersCommentsService_1.default.findByUsername(req.params.username);
+    if (rightUser) {
+        res.send(rightUser);
+    }
+    else {
+        res.sendStatus(400);
+    }
+});
 router.post("/", (_req, res) => {
     res.send("Saving a data");
 });

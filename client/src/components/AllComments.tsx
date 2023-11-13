@@ -1,20 +1,28 @@
 import React, { useState } from "react";
-import { AllUsers, Comments } from "../types";
+import { Comments, Replies, UserInfo } from "../types";
 import AddComment from "./AddComment";
 import replyIcon from "./images/icon-reply.svg";
 
 type Props = {
   allComments: Comments[];
-  currentUser: AllUsers[];
+  // currentUser: AllUsers[];
+  currentUser: UserInfo | undefined;
+  replies: Replies[];
+  allUsers: UserInfo[] | undefined;
 };
 
-const AllComments = ({ allComments, currentUser }: Props) => {
+const AllComments = ({
+  allComments,
+  currentUser,
+  replies,
+  allUsers,
+}: Props) => {
   const [replyForm, setReplyForm] = useState("");
 
   return (
     <div>
       {allComments.map((c) => (
-        <div key={c.id}>
+        <div key={c.comment_id}>
           <div className="content-style">
             <div className="layout-direction-row">
               <div className="layout-direction-column score-style">
@@ -23,18 +31,17 @@ const AllComments = ({ allComments, currentUser }: Props) => {
                 <button className="score-btn">-</button>
               </div>
 
-              <img src={require(`${c.user?.image?.png}`)} alt="dynamic" />
+              {/* <img src={require(`${c.user?.image?.png}`)} alt="dynamic" /> */}
+              <img src={require(`${c.image_png}`)} alt="dynamic" />
               <div>
-                <b>{c.user?.username}</b>
+                <b>{c.username}</b>
               </div>
               <div style={{ padding: "0 10px" }}>{c.createdAt}</div>
               <div className="reply-btn-layout">
                 <button
                   className="reply-btn"
                   value={replyForm}
-                  onClick={() =>
-                    setReplyForm(c.user?.username ? c.user?.username : "")
-                  }
+                  onClick={() => setReplyForm(c.username ? c.username : "")}
                 >
                   <img src={replyIcon} alt="reply icon" className="reply-img" />
                   Reply
@@ -44,15 +51,16 @@ const AllComments = ({ allComments, currentUser }: Props) => {
 
             <p>{c.content}</p>
           </div>
-          {replyForm === c.user?.username ? (
+          {replyForm === c.username ? (
             <div>
-              <AddComment currentUser={currentUser} />
+              <AddComment currentUser={currentUser} replyingTo={true} />
             </div>
           ) : (
             <></>
           )}
 
-          {c.replies?.length > 0 ? (
+          {/* {c.replies !== undefined && c.replies?.length > 0 ? ( */}
+          {replies.length > 0 && c.replies === 1 ? (
             <div
               className="layout-direction-row"
               style={{ margin: "-20px 0 0 0" }}
@@ -60,64 +68,73 @@ const AllComments = ({ allComments, currentUser }: Props) => {
               <div className="vertical-line"></div>
 
               <div>
-                {c.replies?.map((r) => (
+                {replies?.map((r) => (
                   <div key={r.id}>
-                    <div className="content-style">
-                      <div className="layout-direction-row">
-                        <div className="layout-direction-column score-style">
-                          <button className="score-btn">+</button>
-                          {r.score}
-                          <button className="score-btn">-</button>
-                        </div>
+                    {c.comment_id === r.comment_id ? (
+                      <div className="content-style">
+                        <div className="layout-direction-row">
+                          <div className="layout-direction-column score-style">
+                            <button className="score-btn">+</button>
+                            {r.score}
+                            <button className="score-btn">-</button>
+                          </div>
 
-                        <img src={require(`${r.user?.image?.png}`)} />
-                        <div>
-                          <b>{r.user?.username}</b>
-                        </div>
-                        <div>
-                          {r.user?.username ===
-                          currentUser[0].currentUser.username ? (
+                          <img src={require(`${r.image_png}`)} />
+                          <div>
+                            <b>{r.username}</b>
+                          </div>
+                          <div>
+                            {/* { currentUser[0].currentUser.username = r.user?.username ? ( 
                             <span className="current-user">you</span>
                           ) : (
                             <></>
-                          )}
-                        </div>
-                        <div style={{ padding: "0 10px" }}>{r.createdAt}</div>
+                          )} */}
+                            {currentUser?.username === r.user?.username ? (
+                              <span className="current-user">you</span>
+                            ) : (
+                              <></>
+                            )}
+                          </div>
+                          <div style={{ padding: "0 10px" }}>{r.createdAt}</div>
 
-                        <div className="reply-btn-layout">
-                          <button
-                            className="reply-btn"
-                            value={replyForm}
-                            onClick={() =>
-                              setReplyForm(
-                                r.user?.username ? r.user?.username : ""
-                              )
-                            }
-                          >
-                            <img
-                              src={replyIcon}
-                              alt="reply icon"
-                              className="reply-img"
-                            />
-                            Reply
-                          </button>
+                          <div className="reply-btn-layout">
+                            <button
+                              className="reply-btn"
+                              value={replyForm}
+                              onClick={() =>
+                                setReplyForm(r?.username ? r.username : "")
+                              }
+                            >
+                              <img
+                                src={replyIcon}
+                                alt="reply icon"
+                                className="reply-img"
+                              />
+                              Reply
+                            </button>
+                          </div>
                         </div>
+                        <p>
+                          <span
+                            style={{
+                              color: "hsl(238, 40%, 52%)",
+                              padding: " 0 5px 0 0",
+                            }}
+                          >
+                            {r.replyingTo}@
+                          </span>
+                          {r.content}
+                        </p>
                       </div>
-                      <p>
-                        <span
-                          style={{
-                            color: "hsl(238, 40%, 52%)",
-                            padding: " 0 5px 0 0",
-                          }}
-                        >
-                          {r.replyingTo}@
-                        </span>
-                        {r.content}
-                      </p>
-                    </div>
-                    {replyForm === r.user?.username ? (
+                    ) : (
+                      <></>
+                    )}
+                    {replyForm === r?.username ? (
                       <div>
-                        <AddComment currentUser={currentUser} />
+                        <AddComment
+                          currentUser={currentUser}
+                          replyingTo={true}
+                        />
                       </div>
                     ) : (
                       <></>
@@ -131,7 +148,7 @@ const AllComments = ({ allComments, currentUser }: Props) => {
           )}
         </div>
       ))}
-      <AddComment currentUser={currentUser} />
+      <AddComment currentUser={currentUser} replyingTo={false} />
     </div>
   );
 };

@@ -1,28 +1,55 @@
 import React, { useState, useEffect } from "react";
-import { AllUsers, Comments, Replies } from "./types";
+import { AllUsers, Comments, Replies, UserInfo } from "./types";
 import "./styles.css";
 import axios from "axios";
-import { getAllUsers } from "./services/usersCommentServices";
+import {
+  getAllUsers,
+  getComments,
+  getReplies,
+} from "./services/databaseServices";
 import AllComments from "./components/AllComments";
-import { CurrentUser } from "../../server/src/types";
 
 function App() {
-  const [currentUser, setCurrentUser] = useState<AllUsers[]>([]);
+  const [currentUser, setCurrentUser] = useState<UserInfo>();
   const [allComments, setAllComments] = useState<Comments[]>([]);
+
+  const [allUser, setAllUser] = useState<UserInfo[]>([]);
+  const [replies, setReplies] = useState<Replies[]>([]);
+
+  // useEffect(() => {
+  //   getAllUsers.then((response) => {
+  //     setCurrentUser(response);
+  //      console.log(response);
+  //     setAllComments(response[0].comments);
+  //   });
+  // }, []);
 
   useEffect(() => {
     getAllUsers.then((response) => {
-      setCurrentUser(response);
-      console.log(response);
-      setAllComments(response[0].comments);
+      setAllUser(response);
+
+      response.map((r) => {
+        return r.admin === 1 ? setCurrentUser(r) : "";
+      });
+    });
+
+    getComments.then((response) => {
+      setAllComments(response);
+    });
+
+    getReplies.then((response) => {
+      setReplies(response);
     });
   }, []);
 
-  console.log(allComments);
-
   return (
     <div className="app">
-      <AllComments allComments={allComments} currentUser={currentUser} />
+      <AllComments
+        allComments={allComments}
+        currentUser={currentUser}
+        allUsers={allUser}
+        replies={replies}
+      />
     </div>
   );
 }
