@@ -25,14 +25,55 @@ databaseRouter.get("/", (_req, res) => {
 });
 
 databaseRouter.get("/replies", (_req, res) => {
-  const sql = "SELECT * FROM replies r, users u WHERE u.user_id = r.user_id";
+  // TODO: Not work correct. fix it!
 
+  const sql =
+    "SELECT * FROM replies r, users u WHERE u.user_id = r.user_id ORDER BY CASE WHEN r.replyingToUserId > 0 THEN r.replyingToUserId ELSE r.id END ASC";
   connection.query(sql, (err, result) => {
-    if (err) throw err;
-
     console.log(result);
 
+    if (err) throw err;
+
     res.send(result);
+  });
+});
+
+// TODO: jatka tästä!
+databaseRouter.post("/", (req, res) => {
+  console.log(req.body, "mitä tulee");
+
+  // pitäisikö comment_id:llä päivättää myös commentin replies = 1
+  const sql = "UPDATE comments SET replies = 1 WHERE comment_id = ?";
+  const sql2 =
+    "INSERT INTO replies (`content`, `createdAt`, `score`, `user_id`, `comment_id`, `replyingTo`, `replyingToUserId`) VALUES (?,?,?,?,?,?,?)";
+
+  connection.query(sql, req.body.comment_id, (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send(err);
+      return;
+    }
+
+    connection.query(
+      sql2,
+      [
+        req.body.content,
+        req.body.createdAt,
+        req.body.score,
+        req.body.user_id,
+        req.body.comment_id,
+        req.body.replyingTo,
+        req.body.replyingToUserId,
+      ],
+      (err, result) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send(err);
+          return;
+        }
+        res.send(result);
+      }
+    );
   });
 });
 

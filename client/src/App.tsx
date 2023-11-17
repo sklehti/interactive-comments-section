@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { AllUsers, Comments, Replies, UserInfo } from "./types";
+import { Comments, Replies, UserInfo } from "./types";
 import "./styles.css";
-import axios from "axios";
 import {
   getAllUsers,
   getComments,
@@ -25,7 +24,7 @@ function App() {
   // }, []);
 
   useEffect(() => {
-    getAllUsers.then((response) => {
+    getAllUsers().then((response) => {
       setAllUser(response);
 
       response.map((r) => {
@@ -33,11 +32,11 @@ function App() {
       });
     });
 
-    getComments.then((response) => {
+    getComments().then((response) => {
       setAllComments(response);
     });
 
-    getReplies.then((response) => {
+    getReplies().then((response) => {
       setReplies(response);
     });
   }, []);
@@ -49,6 +48,8 @@ function App() {
         currentUser={currentUser}
         allUsers={allUser}
         replies={replies}
+        setAllComments={setAllComments}
+        setReplies={setReplies}
       />
     </div>
   );

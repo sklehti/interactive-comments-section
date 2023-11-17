@@ -1,11 +1,26 @@
 body {
+  width: 100%;
   margin: 0;
-  padding: 0 20px;
+  padding: 0;
   background-color: hsl(228, 33%, 97%);
   font-size: 16px;
   font-family: "Rubik", sans-serif;
   display: flex;
   justify-content: center;
+}
+
+.app {
+  max-width: 700px;
+  padding: 0 20px;
+}
+
+.desktop-view {
+  display: flex;
+  flex-direction: row;
+}
+
+.mobile-view {
+  display: none;
 }
 
 img {
@@ -46,6 +61,9 @@ textarea {
   font-size: 10.5px;
   cursor: pointer;
 }
+.send-btn:hover {
+  background-color: hsl(238, 32%, 59%);
+}
 
 .layout-direction-row {
   display: flex;
@@ -68,9 +86,10 @@ textarea {
 
 .score-style {
   background-color: hsl(223, 19%, 93%);
-  text-align: center;
   border: 1px solid hsl(223, 19%, 93%);
   border-radius: 4px;
+  display: flex;
+  align-items: center;
 }
 
 .score-btn {
@@ -90,6 +109,10 @@ textarea {
   height: auto;
   padding: 0 5px;
 }
+.reply-img:hover {
+  filter: invert(51%) sepia(19%) saturate(1106%) hue-rotate(200deg)
+    brightness(86%) contrast(86%);
+}
 
 .reply-btn {
   right: 0;
@@ -98,6 +121,14 @@ textarea {
   border: none;
   cursor: pointer;
   font-family: "Rubik", sans-serif;
+  margin-right: 5px;
+}
+.reply-btn:hover {
+  color: hsl(239, 24%, 62%);
+}
+.reply-btn:hover > .reply-img {
+  filter: invert(51%) sepia(19%) saturate(1106%) hue-rotate(200deg)
+    brightness(86%) contrast(86%);
 }
 
 .current-user {
@@ -108,14 +139,52 @@ textarea {
   font-size: 14px;
 }
 
-.vertical-line {
-  border-left: 2px solid hsl(223, 19%, 93%);
-  height: auto;
-  left: 50%;
-  padding-right: 30px;
-  margin: 20px 0 20px 30px;
+.vertical-line-layout {
+  min-width: 80px;
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 20px 0;
 }
 
-.app {
-  max-width: 700px;
+.vertical-line {
+  border-left: 2px solid hsl(223, 19%, 93%);
+  height: 100%;
+  left: 50%;
+}
+
+@media screen and (max-width: 750px) {
+  body {
+    font-size: 14px;
+  }
+
+  .app {
+    max-width: 90vw;
+    padding: 0 10px;
+  }
+
+  .desktop-view {
+    display: none;
+  }
+
+  .mobile-view {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+  }
+
+  .score-style {
+    padding: 3px;
+    margin: 10px 3px 3px 3px;
+  }
+
+  .vertical-line-layout {
+    min-width: 20px;
+    display: flex;
+    justify-content: left;
+  }
+
+  .content-style {
+    padding: 10px;
+  }
 }

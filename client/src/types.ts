@@ -1,4 +1,4 @@
-// NOTE! Maybe we don't need all these interfaces
+// NOTE! Updagte server side types.ts
 export interface AllUsers {
   id?: number;
   comments: Comments[];
@@ -12,13 +12,11 @@ export interface CurrentUser {
 
 export interface Comments {
   content: string;
-  createdAt: string;
+  createdAt: Date;
   score?: number;
-  // user?: User;
   username: string;
   image_png: string;
   image_webp: string;
-  // replies?: Replies[];
   comment_id: number;
   replies: number;
 }
@@ -41,14 +39,14 @@ export interface Image {
 }
 
 export interface Replies {
-  id: number;
+  id?: number;
   content?: string;
   score?: number;
-  createdAt?: string;
-  user?: User; // TODO: muuta tämä sellaiseksi joka tuo nimen ja kuvan!
-  // user_id: number;
+  createdAt?: Date;
+  user_id: number;
   replyingTo: string;
   comment_id: number;
   username: string;
   image_png: string;
+  replyingToUserId: number | undefined;
 }
