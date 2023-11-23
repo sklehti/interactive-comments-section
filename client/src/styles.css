@@ -23,6 +23,19 @@ body {
   display: none;
 }
 
+.responsive-form-view {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px 10px 10px 0;
+}
+
+.mobile-form-content-layout {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
 img {
   height: 45px;
   width: auto;
@@ -104,7 +117,8 @@ textarea {
   right: 0;
 }
 
-.reply-img {
+.reply-img,
+.delete-img {
   width: 10px;
   height: auto;
   padding: 0 5px;
@@ -113,15 +127,23 @@ textarea {
   filter: invert(51%) sepia(19%) saturate(1106%) hue-rotate(200deg)
     brightness(86%) contrast(86%);
 }
+.delete-img:hover {
+  filter: invert(81%) sepia(73%) saturate(5070%) hue-rotate(298deg)
+    brightness(101%) contrast(86%);
+}
 
-.reply-btn {
+.reply-btn,
+.delete-btn {
   right: 0;
-  color: hsl(238, 40%, 52%);
   background-color: hsl(0, 0%, 100%);
   border: none;
   cursor: pointer;
   font-family: "Rubik", sans-serif;
   margin-right: 5px;
+}
+
+.reply-btn {
+  color: hsl(238, 40%, 52%);
 }
 .reply-btn:hover {
   color: hsl(239, 24%, 62%);
@@ -129,6 +151,17 @@ textarea {
 .reply-btn:hover > .reply-img {
   filter: invert(51%) sepia(19%) saturate(1106%) hue-rotate(200deg)
     brightness(86%) contrast(86%);
+}
+
+.delete-btn {
+  color: hsl(358, 79%, 66%);
+}
+.delete-btn:hover {
+  color: hsl(358, 74%, 75%);
+}
+.delete-btn:hover > .delete-img {
+  filter: invert(71%) sepia(75%) saturate(5070%) hue-rotate(298deg)
+    brightness(101%) contrast(86%);
 }
 
 .current-user {
@@ -150,6 +183,55 @@ textarea {
   border-left: 2px solid hsl(223, 19%, 93%);
   height: 100%;
   left: 50%;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 35vh;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  border-radius: 10px;
+  width: 33vw;
+  color: #444343;
+}
+
+.modal-btn {
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  padding: 7px 15px;
+  margin: 20px 0 0 0;
+  font-size: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.modal-delete-btn {
+  background-color: hsl(358, 79%, 66%);
+}
+.modal-delete-btn:hover {
+  background-color: hsl(358, 74%, 74%);
+}
+
+.modal-cancel-btn {
+  background-color: hsl(240, 1%, 51%);
+}
+.modal-cancel-btn:hover {
+  background-color: hsl(220, 2%, 67%);
 }
 
 @media screen and (max-width: 750px) {

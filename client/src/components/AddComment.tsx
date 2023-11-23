@@ -77,29 +77,40 @@ const AddComment = ({
 
   return (
     <div className="content-style" style={{ marginTop: 0 }}>
-      <form className="layout-direction-row" onSubmit={handleCommentForm}>
-        <div>
-          {currentUser !== undefined ? (
-            <img src={require(`${currentUser.image_png}`)} />
-          ) : (
-            <></>
-          )}
+      <form onSubmit={handleCommentForm}>
+        <div className="mobile-form-content-layout">
+          <textarea
+            className="mobile-view"
+            placeholder="Add a comment..."
+            value={text}
+            onChange={({ target }) => setText(target.value)}
+          ></textarea>
         </div>
-        <textarea
-          placeholder="Add a comment..."
-          value={text}
-          onChange={({ target }) => setText(target.value)}
-        ></textarea>
-        <div>
-          {replyingTo ? (
-            <button className="send-btn" type="submit">
-              REPLY
-            </button>
-          ) : (
-            <button className="send-btn" type="submit">
-              SEND
-            </button>
-          )}
+        <div className="responsive-form-view">
+          <div>
+            {currentUser !== undefined ? (
+              <img src={require(`${currentUser.image_png}`)} />
+            ) : (
+              <></>
+            )}
+          </div>
+          <textarea
+            className="desktop-view"
+            placeholder="Add a comment..."
+            value={text}
+            onChange={({ target }) => setText(target.value)}
+          ></textarea>
+          <div>
+            {replyingTo ? (
+              <button className="send-btn" type="submit">
+                REPLY
+              </button>
+            ) : (
+              <button className="send-btn" type="submit">
+                SEND
+              </button>
+            )}
+          </div>
         </div>
       </form>
     </div>

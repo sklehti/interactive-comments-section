@@ -25,8 +25,6 @@ databaseRouter.get("/", (_req, res) => {
 });
 
 databaseRouter.get("/replies", (_req, res) => {
-  // TODO: Not work correct. fix it!
-
   const sql =
     "SELECT * FROM replies r, users u WHERE u.user_id = r.user_id ORDER BY CASE WHEN r.replyingToUserId > 0 THEN r.replyingToUserId ELSE r.id END ASC";
   connection.query(sql, (err, result) => {
@@ -40,8 +38,6 @@ databaseRouter.get("/replies", (_req, res) => {
 
 // TODO: jatka tästä!
 databaseRouter.post("/", (req, res) => {
-  console.log(req.body, "mitä tulee");
-
   // pitäisikö comment_id:llä päivättää myös commentin replies = 1
   const sql = "UPDATE comments SET replies = 1 WHERE comment_id = ?";
   const sql2 =
@@ -74,6 +70,19 @@ databaseRouter.post("/", (req, res) => {
         res.send(result);
       }
     );
+  });
+});
+
+// Delete comment from replies table
+databaseRouter.delete("/replies/:id", (req, res) => {
+  console.log(req.params.id, "test");
+
+  const sql = "DELETE FROM replies WHERE id=?";
+
+  connection.query(sql, [req.params.id], (err) => {
+    if (err) throw err;
+
+    res.send({ status: 200 });
   });
 });
 

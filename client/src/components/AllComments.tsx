@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Comments, Replies, UserInfo } from "../types";
 import AddComment from "./AddComment";
 import replyIcon from "./images/icon-reply.svg";
+import editIcon from "./images/icon-edit.svg";
+import deleteIcon from "./images/icon-delete.svg";
 import { formatDistance } from "date-fns";
+import { CurrentUser } from "../../../server/src/types";
 
 type Props = {
   allComments: Comments[];
@@ -23,6 +26,16 @@ const AllComments = ({
 }: Props) => {
   const [replyForm, setReplyForm] = useState({ username: "", command_id: -1 });
 
+  const handlePlusScore = (event: React.FormEvent<HTMLButtonElement>) => {
+    if (event.currentTarget.value !== currentUser?.username)
+      console.log("lisää piste", event.currentTarget);
+  };
+
+  const handleMinusScore = (event: React.FormEvent<HTMLButtonElement>) => {
+    if (event.currentTarget.value !== currentUser?.username)
+      console.log("vähennä piste", event.currentTarget);
+  };
+
   return (
     <div>
       {allComments.map((c) => (
@@ -31,9 +44,21 @@ const AllComments = ({
             <div className="layout-direction-row">
               <div className="desktop-view">
                 <div className="layout-direction-column score-style">
-                  <button className="score-btn">+</button>
+                  <button
+                    className="score-btn"
+                    value={c.username}
+                    onClick={handlePlusScore}
+                  >
+                    +
+                  </button>
                   {c.score}
-                  <button className="score-btn">-</button>
+                  <button
+                    className="score-btn"
+                    value={c.username}
+                    onClick={handleMinusScore}
+                  >
+                    -
+                  </button>
                 </div>
               </div>
 
@@ -43,13 +68,25 @@ const AllComments = ({
               </div>
               <div style={{ padding: "0 10px" }}></div>
               <div className="desktop-view">
-                <AnswerToReply setReplyForm={setReplyForm} reply={c} />
+                <AnswerToReply
+                  setReplyForm={setReplyForm}
+                  reply={c}
+                  currentUser={currentUser}
+                  handlePlusScore={handlePlusScore}
+                  handleMinusScore={handleMinusScore}
+                />
               </div>
             </div>
 
             <p>{c.content}</p>
             <div className="mobile-view">
-              <AnswerToReply setReplyForm={setReplyForm} reply={c} />
+              <AnswerToReply
+                setReplyForm={setReplyForm}
+                reply={c}
+                currentUser={currentUser}
+                handlePlusScore={handlePlusScore}
+                handleMinusScore={handleMinusScore}
+              />
             </div>
           </div>
           {replyForm.command_id === c.comment_id &&
@@ -84,9 +121,21 @@ const AllComments = ({
                         <div className="layout-direction-row">
                           <div className="desktop-view">
                             <div className="layout-direction-column score-style">
-                              <button className="score-btn">+</button>
+                              <button
+                                className="score-btn"
+                                value={r.username}
+                                onClick={handlePlusScore}
+                              >
+                                +
+                              </button>
                               {r.score}
-                              <button className="score-btn">-</button>
+                              <button
+                                className="score-btn"
+                                value={r.username}
+                                onClick={handleMinusScore}
+                              >
+                                -
+                              </button>
                             </div>
                           </div>
                           <img src={require(`${r.image_png}`)} />
@@ -108,6 +157,9 @@ const AllComments = ({
                             <AnswerToReply
                               setReplyForm={setReplyForm}
                               reply={r}
+                              currentUser={currentUser}
+                              handlePlusScore={handlePlusScore}
+                              handleMinusScore={handleMinusScore}
                             />
                           </div>
                         </div>
@@ -126,6 +178,9 @@ const AllComments = ({
                           <AnswerToReply
                             setReplyForm={setReplyForm}
                             reply={r}
+                            currentUser={currentUser}
+                            handlePlusScore={handlePlusScore}
+                            handleMinusScore={handleMinusScore}
                           />
                         </div>
                       </div>
@@ -160,7 +215,7 @@ const AllComments = ({
           )}
         </div>
       ))}
-      {/* TODO: next doesn't work */}
+
       <div style={{ paddingTop: "20px" }}>
         <AddComment
           currentUser={currentUser}
@@ -182,33 +237,78 @@ type ReplyProps = {
     React.SetStateAction<{ username: string; command_id: number }>
   >;
   reply: Replies | Comments;
+  currentUser: UserInfo | undefined;
+  handlePlusScore: (event: React.FormEvent<HTMLButtonElement>) => void;
+  handleMinusScore: (event: React.FormEvent<HTMLButtonElement>) => void;
 };
 
-const AnswerToReply = ({ setReplyForm, reply }: ReplyProps) => {
+const AnswerToReply = ({
+  setReplyForm,
+  reply,
+  currentUser,
+  handlePlusScore,
+  handleMinusScore,
+}: ReplyProps) => {
+  const handleDeleteModal = (reply: Replies | Comments) => {
+    const modal = document.getElementById("myModal");
+
+    if (modal) {
+      modal.style.display = "block";
+    }
+  };
+
   return (
     <>
       <div className="mobile-view">
         <div className="layout-direction-row score-style">
-          <button className="score-btn">+</button>
+          <button
+            className="score-btn"
+            value={reply.username}
+            onClick={handlePlusScore}
+          >
+            +
+          </button>
           {reply.score}
-          <button className="score-btn">-</button>
+          <button
+            className="score-btn"
+            value={reply.username}
+            onClick={handleMinusScore}
+          >
+            -
+          </button>
         </div>
       </div>
       <div className="reply-btn-layout">
-        <button
-          className="reply-btn"
-          // value={replyForm}
-          onClick={() =>
-            setReplyForm(
-              reply?.username
-                ? { username: reply.username, command_id: reply.comment_id }
-                : { username: "", command_id: -1 }
-            )
-          }
-        >
-          <img src={replyIcon} alt="reply icon" className="reply-img" />
-          Reply
-        </button>
+        {reply.username !== currentUser?.username ? (
+          <button
+            className="reply-btn"
+            // value={replyForm}
+            onClick={() =>
+              setReplyForm(
+                reply?.username
+                  ? { username: reply.username, command_id: reply.comment_id }
+                  : { username: "", command_id: -1 }
+              )
+            }
+          >
+            <img src={replyIcon} alt="reply icon" className="reply-img" />
+            Reply
+          </button>
+        ) : (
+          <>
+            <button
+              className="delete-btn"
+              onClick={() => handleDeleteModal(reply)}
+            >
+              <img src={deleteIcon} alt="delete icon" className="delete-img" />
+              Delete
+            </button>
+            <button className="reply-btn">
+              <img src={editIcon} alt="edit icon" className="reply-img" />
+              Edit
+            </button>
+          </>
+        )}
       </div>
     </>
   );

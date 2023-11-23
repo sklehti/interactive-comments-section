@@ -23,3 +23,8 @@ export const createComment = (comment: Replies) =>
     .catch(function (error) {
       console.log(error);
     });
+
+export const deleteReplies = (id: number) =>
+  axios
+    .delete<Replies[]>(`${baseUrl}/replies/:${id}`)
+    .then((response) => response.data);

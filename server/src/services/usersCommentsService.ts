@@ -10,7 +10,6 @@ const addComment = () => {
 };
 
 const findByUsername = (username: string): AllUsers | undefined => {
-  // DO THIS LATER!
   const entry = usersCommentData.find(
     (d) => d.currentUser.username === username
   );
