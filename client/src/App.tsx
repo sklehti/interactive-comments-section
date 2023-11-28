@@ -5,12 +5,14 @@ import {
   getAllUsers,
   getComments,
   getReplies,
+  deleteReplies
 } from "./services/databaseServices";
 import AllComments from "./components/AllComments";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<UserInfo>();
   const [allComments, setAllComments] = useState<Comments[]>([]);
+  const [deleteCommentId,setDeleteCommentId] = useState(-1)
 
   const [allUser, setAllUser] = useState<UserInfo[]>([]);
   const [replies, setReplies] = useState<Replies[]>([]);
@@ -25,14 +27,17 @@ function App() {
   //   });
   // }, []);
 
+
+
   useEffect(() => {
-    getAllUsers().then((response) => {
+     getAllUsers().then((response) => {
       setAllUser(response);
+      
 
       response.map((r) => {
         return r.admin === 1 ? setCurrentUser(r) : "";
       });
-    });
+    }); 
 
     getComments().then((response) => {
       setAllComments(response);
@@ -41,7 +46,7 @@ function App() {
     getReplies().then((response) => {
       setReplies(response);
     });
-  }, []);
+  }, [setAllUser, deleteCommentId]);
 
   // useEffect(() => {
   //   if (modal) {
@@ -54,15 +59,20 @@ function App() {
   // }, [modal]);
 
   const handleCancel = () => {
-    console.log("cancel");
-
     if (modal) {
       modal.style.display = "none";
     }
   };
 
   const handleDelete = () => {
-    console.log("delete");
+    if (deleteCommentId > -1) {
+      deleteReplies(deleteCommentId).then(result => {
+        console.log(result);
+
+        setDeleteCommentId(-1);
+
+      })
+    }
 
     if (modal) {
       modal.style.display = "none";
@@ -71,7 +81,6 @@ function App() {
 
   return (
     <div className="app">
-      {/* TODO */}
       <div id="myModal" className="modal">
         <div className="modal-content">
           <h4>Delete comment</h4>
@@ -106,6 +115,7 @@ function App() {
         replies={replies}
         setAllComments={setAllComments}
         setReplies={setReplies}
+        setDeleteCommentId={setDeleteCommentId}
       />
     </div>
   );

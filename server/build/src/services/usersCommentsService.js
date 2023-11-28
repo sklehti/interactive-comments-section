@@ -11,7 +11,6 @@ const addComment = () => {
     return null;
 };
 const findByUsername = (username) => {
-    // DO THIS LATER!
     const entry = data_1.default.find((d) => d.currentUser.username === username);
     return entry;
 };

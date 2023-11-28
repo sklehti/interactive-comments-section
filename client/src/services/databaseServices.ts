@@ -26,5 +26,5 @@ export const createComment = (comment: Replies) =>
 
 export const deleteReplies = (id: number) =>
   axios
-    .delete<Replies[]>(`${baseUrl}/replies/:${id}`)
+    .delete<Replies[]>(`${baseUrl}/replies/${id}`)
     .then((response) => response.data);

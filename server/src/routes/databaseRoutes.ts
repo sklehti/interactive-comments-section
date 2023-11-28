@@ -6,7 +6,7 @@ const databaseRouter = express.Router();
 databaseRouter.get("/allUsers", (_req, res) => {
   const sql = "SELECT * FROM users";
 
-  connection.query(sql, (err, result) => {
+  connection.query(sql, (err:any, result:any) => {
     if (err) throw err;
     res.send(result);
   });
@@ -17,7 +17,7 @@ databaseRouter.get("/", (_req, res) => {
   // const sql =
   //   "SELECT * FROM comments c, replies r WHERE c.comment_id = r.comment_id";
 
-  connection.query(sql, (err, result) => {
+  connection.query(sql, (err:any, result:any) => {
     if (err) throw err;
 
     res.send(result);
@@ -27,7 +27,7 @@ databaseRouter.get("/", (_req, res) => {
 databaseRouter.get("/replies", (_req, res) => {
   const sql =
     "SELECT * FROM replies r, users u WHERE u.user_id = r.user_id ORDER BY CASE WHEN r.replyingToUserId > 0 THEN r.replyingToUserId ELSE r.id END ASC";
-  connection.query(sql, (err, result) => {
+  connection.query(sql, (err:any, result:any) => {
     console.log(result);
 
     if (err) throw err;
@@ -43,7 +43,7 @@ databaseRouter.post("/", (req, res) => {
   const sql2 =
     "INSERT INTO replies (`content`, `createdAt`, `score`, `user_id`, `comment_id`, `replyingTo`, `replyingToUserId`) VALUES (?,?,?,?,?,?,?)";
 
-  connection.query(sql, req.body.comment_id, (err) => {
+  connection.query(sql, req.body.comment_id, (err:any) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
@@ -61,7 +61,7 @@ databaseRouter.post("/", (req, res) => {
         req.body.replyingTo,
         req.body.replyingToUserId,
       ],
-      (err, result) => {
+      (err:any, result:any) => {
         if (err) {
           console.error(err);
           res.status(500).send(err);
@@ -79,7 +79,7 @@ databaseRouter.delete("/replies/:id", (req, res) => {
 
   const sql = "DELETE FROM replies WHERE id=?";
 
-  connection.query(sql, [req.params.id], (err) => {
+  connection.query(sql, [req.params.id], (err:any) => {
     if (err) throw err;
 
     res.send({ status: 200 });
