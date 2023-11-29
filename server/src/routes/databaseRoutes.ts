@@ -36,9 +36,7 @@ databaseRouter.get("/replies", (_req, res) => {
   });
 });
 
-// TODO: jatka tästä!
-databaseRouter.post("/", (req, res) => {
-  // pitäisikö comment_id:llä päivättää myös commentin replies = 1
+databaseRouter.post("/replies", (req, res) => {
   const sql = "UPDATE comments SET replies = 1 WHERE comment_id = ?";
   const sql2 =
     "INSERT INTO replies (`content`, `createdAt`, `score`, `user_id`, `comment_id`, `replyingTo`, `replyingToUserId`) VALUES (?,?,?,?,?,?,?)";
@@ -73,11 +71,48 @@ databaseRouter.post("/", (req, res) => {
   });
 });
 
+databaseRouter.post("/newComment", (req, res) => { 
+  
+  const sql =
+    "INSERT INTO comments (`content`, `createdAt`, `score`, `user_id`, `replies`) VALUES (?,?,?,?,?)";
+
+  connection.query(
+    sql,
+    [
+      req.body.content,
+      req.body.createdAt,
+      0,
+      req.body.user_id,
+      0
+    ],
+    (err:any, result:any) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send(err);
+        return;
+      }
+      res.send(result);
+    }
+  );
+});
+
+
 // Delete comment from replies table
 databaseRouter.delete("/replies/:id", (req, res) => {
-  console.log(req.params.id, "test");
-
+  
   const sql = "DELETE FROM replies WHERE id=?";
+
+  connection.query(sql, [req.params.id], (err:any) => {
+    if (err) throw err;
+
+    res.send({ status: 200 });
+  });
+});
+
+// Delete comment from replies table
+databaseRouter.delete("/comments/:id", (req, res) => {
+ 
+  const sql = "DELETE FROM comments WHERE comment_id=?";
 
   connection.query(sql, [req.params.id], (err:any) => {
     if (err) throw err;

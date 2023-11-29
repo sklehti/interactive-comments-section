@@ -5,14 +5,16 @@ import {
   getAllUsers,
   getComments,
   getReplies,
-  deleteReplies
+  deleteReplies,
+  deleteComment
 } from "./services/databaseServices";
 import AllComments from "./components/AllComments";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<UserInfo>();
   const [allComments, setAllComments] = useState<Comments[]>([]);
-  const [deleteCommentId,setDeleteCommentId] = useState(-1)
+  const [deleteCommentId,setDeleteCommentId] = useState(-1);
+  const [deleteId, setDeleteId] = useState(-1);
 
   const [allUser, setAllUser] = useState<UserInfo[]>([]);
   const [replies, setReplies] = useState<Replies[]>([]);
@@ -46,7 +48,7 @@ function App() {
     getReplies().then((response) => {
       setReplies(response);
     });
-  }, [setAllUser, deleteCommentId]);
+  }, [setAllUser, deleteCommentId, deleteId]);
 
   // useEffect(() => {
   //   if (modal) {
@@ -65,13 +67,22 @@ function App() {
   };
 
   const handleDelete = () => {
-    if (deleteCommentId > -1) {
-      deleteReplies(deleteCommentId).then(result => {
+    if (deleteId > -1) {
+      deleteReplies(deleteId).then(result => {
+        console.log(result);
+
+        setDeleteId(-1);
+
+      })
+    } else if (deleteCommentId > -1) {
+      
+      deleteComment(deleteCommentId).then(result => {
         console.log(result);
 
         setDeleteCommentId(-1);
 
       })
+      
     }
 
     if (modal) {
@@ -116,6 +127,7 @@ function App() {
         setAllComments={setAllComments}
         setReplies={setReplies}
         setDeleteCommentId={setDeleteCommentId}
+        setDeleteId={setDeleteId}
       />
     </div>
   );

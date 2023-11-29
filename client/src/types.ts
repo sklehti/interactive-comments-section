@@ -1,4 +1,4 @@
-// NOTE! Updagte server side types.ts
+// NOTE! Update server side types.ts
 export interface AllUsers {
   id?: number;
   comments: Comments[];
@@ -8,6 +8,12 @@ export interface AllUsers {
 export interface CurrentUser {
   image: Image;
   username: string;
+}
+
+export interface Comment {
+  content: string;
+  createdAt: Date;
+  user_id: number;
 }
 
 export interface Comments {

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Comments, Replies, UserInfo } from "../types";
+import { Comments, Comment, Replies, UserInfo } from "../types";
 
 const baseUrl = "http://localhost:3001/api/database";
 
@@ -14,12 +14,18 @@ export const getComments = () =>
 export const getReplies = () =>
   axios.get<Replies[]>(`${baseUrl}/replies`).then((response) => response.data);
 
+export const createNewAdminComment = (newComment: Comment) =>
+  axios
+    .post(`${baseUrl}/newComment`, newComment)
+    .then((response) => response.data)
+    .catch(function (error) {
+      console.log(error);
+    });
+
 export const createComment = (comment: Replies) =>
   axios
-    .post(`${baseUrl}/`, comment)
-    .then(function (response) {
-      console.log(response);
-    })
+    .post(`${baseUrl}/replies`, comment)
+    .then((response) => response.data)
     .catch(function (error) {
       console.log(error);
     });
@@ -27,4 +33,9 @@ export const createComment = (comment: Replies) =>
 export const deleteReplies = (id: number) =>
   axios
     .delete<Replies[]>(`${baseUrl}/replies/${id}`)
+    .then((response) => response.data);
+
+export const deleteComment = (id: number) =>
+  axios
+    .delete<Comments[]>(`${baseUrl}/comments/${id}`)
     .then((response) => response.data);

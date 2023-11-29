@@ -14,7 +14,9 @@ type Props = {
   allUsers: UserInfo[] | undefined;
   setAllComments: React.Dispatch<React.SetStateAction<Comments[]>>;
   setReplies: React.Dispatch<React.SetStateAction<Replies[]>>;
-  setDeleteCommentId:React.Dispatch<React.SetStateAction<number>>;
+  setDeleteCommentId: React.Dispatch<React.SetStateAction<number>>;
+  setDeleteId: React.Dispatch<React.SetStateAction<number>>;
+
 };
 
 const AllComments = ({
@@ -24,7 +26,8 @@ const AllComments = ({
   allUsers,
   setAllComments,
   setReplies,
-  setDeleteCommentId
+  setDeleteCommentId,
+  setDeleteId
 }: Props) => {
   const [replyForm, setReplyForm] = useState({ username: "", command_id: -1 });
 
@@ -44,8 +47,8 @@ const AllComments = ({
         <div key={c.comment_id}>
           <div className="content-style">
             <div className="layout-direction-row">
-              <div className="desktop-view">
-                <div className="layout-direction-column score-style">
+              <div className="desktop-view" >
+                <div className="layout-direction-column score-style" >
                   <button
                     className="score-btn"
                     value={c.username}
@@ -77,6 +80,7 @@ const AllComments = ({
                   handlePlusScore={handlePlusScore}
                   handleMinusScore={handleMinusScore}
                   setDeleteCommentId={setDeleteCommentId}
+                  setDeleteId={setDeleteId}
                 />
               </div>
             </div>
@@ -90,6 +94,7 @@ const AllComments = ({
                 handlePlusScore={handlePlusScore}
                 handleMinusScore={handleMinusScore}
                 setDeleteCommentId={setDeleteCommentId}
+                setDeleteId={setDeleteId}
               />
             </div>
           </div>
@@ -165,6 +170,7 @@ const AllComments = ({
                               handlePlusScore={handlePlusScore}
                               handleMinusScore={handleMinusScore}
                               setDeleteCommentId={setDeleteCommentId}
+                              setDeleteId={setDeleteId}
                             />
                           </div>
                         </div>
@@ -187,6 +193,7 @@ const AllComments = ({
                             handlePlusScore={handlePlusScore}
                             handleMinusScore={handleMinusScore}
                             setDeleteCommentId={setDeleteCommentId}
+                            setDeleteId={setDeleteId}
                           />
                         </div>
                       </div>
@@ -247,6 +254,7 @@ type ReplyProps = {
   handlePlusScore: (event: React.FormEvent<HTMLButtonElement>) => void;
   handleMinusScore: (event: React.FormEvent<HTMLButtonElement>) => void;
   setDeleteCommentId: React.Dispatch<React.SetStateAction<number>>;
+  setDeleteId: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const AnswerToReply = ({
@@ -255,13 +263,18 @@ const AnswerToReply = ({
   currentUser,
   handlePlusScore,
   handleMinusScore,
-  setDeleteCommentId
+  setDeleteCommentId,
+  setDeleteId
 }: ReplyProps) => {
+
   const handleDeleteModal = (reply: Replies | Comments) => {
     const modal = document.getElementById("myModal");
    
     if ("id" in reply ) {
-        setDeleteCommentId(Number(reply.id));
+        setDeleteId(Number(reply.id));
+    }
+    else if ("comment_id" in reply) {
+      setDeleteCommentId(Number(reply.comment_id))
     } else {
       console.log("do delete comment action here!");
       

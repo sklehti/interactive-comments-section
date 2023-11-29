@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { UserInfo, Replies, Comments } from "../types";
+import { UserInfo, Replies, Comments, Comment } from "../types";
 import {
   createComment,
+  createNewAdminComment,
   getComments,
   getReplies,
 } from "../services/databaseServices";
@@ -48,6 +49,7 @@ const AddComment = ({
 
       // answer to replies
       if (comment_id && userName) {
+        
         const replies: Replies = {
           ...comment,
           user_id: currentUser.user_id,
@@ -62,11 +64,23 @@ const AddComment = ({
             setReplies(response);
           });
         });
+
+        // create comment by admin
       } else {
-        // TODO: tee tänne kysymys, joka ei ole vastaus kenenkään kysymkseen
-        // getComments().then((r) => {
-        //   setAllComments(r);
-        // });
+        const newComment: Comment = {
+          content: comment.content,
+          user_id: currentUser.user_id,
+          createdAt: dateObject
+        };
+
+        createNewAdminComment(newComment).then(response => {
+          console.log(response, "Reply created");
+
+          getComments().then((response) => {
+            setAllComments(response);
+          });
+          
+        })
       }
       setText("");
       setReplyForm({ username: "", command_id: -1 });
