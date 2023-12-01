@@ -64,6 +64,11 @@ textarea {
   font-size: 16px;
 }
 
+span {
+  color: hsl(238, 40%, 52%);
+  padding: 0 5px 0 0;
+}
+
 .send-btn {
   font-family: "Rubik", sans-serif;
   background-color: hsl(238, 40%, 52%);
@@ -76,6 +81,12 @@ textarea {
 }
 .send-btn:hover {
   background-color: hsl(238, 32%, 59%);
+}
+
+.update-btn-layout {
+  display: flex;
+  justify-content: right;
+  padding-top: 10px;
 }
 
 .layout-direction-row {
@@ -110,6 +121,13 @@ textarea {
   padding: 5px 10px;
   font-size: 16px;
   cursor: pointer;
+}
+
+.score-layout {
+  display: flex;
+  flex-direction: column;
+
+  margin-right: 20px;
 }
 
 .reply-btn-layout {

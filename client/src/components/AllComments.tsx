@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Comments, Replies, UserInfo } from "../types";
 import AddComment from "./AddComment";
-import replyIcon from "./images/icon-reply.svg";
-import editIcon from "./images/icon-edit.svg";
-import deleteIcon from "./images/icon-delete.svg";
-import { formatDistance } from "date-fns";
-import { CurrentUser } from "../../../server/src/types";
+import DaysFromWriting from "./DaysFromWriting";
+import {
+  getComments,
+  getReplies,
+  updateComment,
+  updateReplies,
+} from "../services/databaseServices";
+import AnswerToReply from "./AnswerToReply";
 
 type Props = {
   allComments: Comments[];
@@ -16,7 +19,6 @@ type Props = {
   setReplies: React.Dispatch<React.SetStateAction<Replies[]>>;
   setDeleteCommentId: React.Dispatch<React.SetStateAction<number>>;
   setDeleteId: React.Dispatch<React.SetStateAction<number>>;
-
 };
 
 const AllComments = ({
@@ -27,9 +29,11 @@ const AllComments = ({
   setAllComments,
   setReplies,
   setDeleteCommentId,
-  setDeleteId
+  setDeleteId,
 }: Props) => {
   const [replyForm, setReplyForm] = useState({ username: "", command_id: -1 });
+  const [editText, setEditText] = useState(-1);
+  const [updateTextContent, setUpdateTextContent] = useState("");
 
   const handlePlusScore = (event: React.FormEvent<HTMLButtonElement>) => {
     if (event.currentTarget.value !== currentUser?.username)
@@ -41,51 +45,123 @@ const AllComments = ({
       console.log("vähennä piste", event.currentTarget);
   };
 
+  const handleUpdateContentSubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+
+    updateComment(updateTextContent, editText).then(() => {
+      getComments().then((response) => {
+        setAllComments(response);
+      });
+    });
+
+    setEditText(-1);
+    setUpdateTextContent("");
+  };
+
+  const handleReplySubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+
+    updateReplies(updateTextContent, editText).then(() => {
+      getReplies().then((response) => {
+        setReplies(response);
+      });
+    });
+
+    setEditText(-1);
+    setUpdateTextContent("");
+  };
+
   return (
     <div>
       {allComments.map((c) => (
         <div key={c.comment_id}>
           <div className="content-style">
             <div className="layout-direction-row">
-              <div className="desktop-view" >
-                <div className="layout-direction-column score-style" >
-                  <button
-                    className="score-btn"
-                    value={c.username}
-                    onClick={handlePlusScore}
-                  >
-                    +
-                  </button>
-                  {c.score}
-                  <button
-                    className="score-btn"
-                    value={c.username}
-                    onClick={handleMinusScore}
-                  >
-                    -
-                  </button>
+              <div className="desktop-view">
+                <div className="score-layout">
+                  <div className="layout-direction-column score-style">
+                    <button
+                      className="score-btn"
+                      value={c.username}
+                      onClick={handlePlusScore}
+                    >
+                      +
+                    </button>
+                    {c.score}
+                    <button
+                      className="score-btn"
+                      value={c.username}
+                      onClick={handleMinusScore}
+                    >
+                      -
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <img src={require(`${c.image_png}`)} alt="dynamic" />
-              <div>
-                <b>{c.username}</b>
-              </div>
-              <div style={{ padding: "0 10px" }}></div>
-              <div className="desktop-view">
-                <AnswerToReply
-                  setReplyForm={setReplyForm}
-                  reply={c}
-                  currentUser={currentUser}
-                  handlePlusScore={handlePlusScore}
-                  handleMinusScore={handleMinusScore}
-                  setDeleteCommentId={setDeleteCommentId}
-                  setDeleteId={setDeleteId}
-                />
+              <div
+                className="layout-direction-column"
+                style={{ position: "relative", width: "100%" }}
+              >
+                <div className="layout-direction-row">
+                  <img src={require(`${c.image_png}`)} alt="dynamic" />
+                  <div>
+                    <b>{c.username}</b>
+                  </div>
+                  <div>
+                    {currentUser?.username === c.username ? (
+                      <span className="current-user">you</span>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+
+                  <div style={{ padding: "0 10px" }}>
+                    <DaysFromWriting reply={c} />
+                  </div>
+
+                  <div style={{ padding: "0 10px" }}></div>
+                  <div className="desktop-view">
+                    <AnswerToReply
+                      setReplyForm={setReplyForm}
+                      reply={c}
+                      currentUser={currentUser}
+                      handlePlusScore={handlePlusScore}
+                      handleMinusScore={handleMinusScore}
+                      setDeleteCommentId={setDeleteCommentId}
+                      setDeleteId={setDeleteId}
+                      setEditText={setEditText}
+                    />
+                  </div>
+                </div>
+
+                {editText === c.comment_id ? (
+                  <form onSubmit={handleUpdateContentSubmit}>
+                    <textarea
+                      style={{ marginTop: "10px" }}
+                      value={
+                        updateTextContent === "" ? c.content : updateTextContent
+                      }
+                      onChange={({ target }) =>
+                        setUpdateTextContent(target.value)
+                      }
+                    >
+                      {c.content}
+                    </textarea>
+                    <div className="update-btn-layout">
+                      <button type="submit" className="send-btn">
+                        update
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div>
+                    <p>{c.content}</p>
+                  </div>
+                )}
               </div>
             </div>
 
-            <p>{c.content}</p>
             <div className="mobile-view">
               <AnswerToReply
                 setReplyForm={setReplyForm}
@@ -95,6 +171,7 @@ const AllComments = ({
                 handleMinusScore={handleMinusScore}
                 setDeleteCommentId={setDeleteCommentId}
                 setDeleteId={setDeleteId}
+                setEditText={setEditText}
               />
             </div>
           </div>
@@ -129,62 +206,100 @@ const AllComments = ({
                       <div className="content-style">
                         <div className="layout-direction-row">
                           <div className="desktop-view">
-                            <div className="layout-direction-column score-style">
-                              <button
-                                className="score-btn"
-                                value={r.username}
-                                onClick={handlePlusScore}
-                              >
-                                +
-                              </button>
-                              {r.score}
-                              <button
-                                className="score-btn"
-                                value={r.username}
-                                onClick={handleMinusScore}
-                              >
-                                -
-                              </button>
+                            <div className="score-layout">
+                              <div className="layout-direction-column score-style">
+                                <button
+                                  className="score-btn"
+                                  value={r.username}
+                                  onClick={handlePlusScore}
+                                >
+                                  +
+                                </button>
+                                {r.score}
+                                <button
+                                  className="score-btn"
+                                  value={r.username}
+                                  onClick={handleMinusScore}
+                                >
+                                  -
+                                </button>
+                              </div>
                             </div>
                           </div>
-                          <img src={require(`${r.image_png}`)} />
-                          <div>
-                            <b>{r.username}</b>
-                          </div>
-                          <div>
-                            {currentUser?.username === r.username ? (
-                              <span className="current-user">you</span>
+
+                          <div
+                            className="layout-direction-column"
+                            style={{ position: "relative", width: "100%" }}
+                          >
+                            <div className="layout-direction-row">
+                              <img src={require(`${r.image_png}`)} />
+                              <div>
+                                <b>{r.username}</b>
+                              </div>
+                              <div>
+                                {currentUser?.username === r.username ? (
+                                  <span className="current-user">you</span>
+                                ) : (
+                                  <></>
+                                )}
+                              </div>
+                              <div style={{ padding: "0 10px" }}>
+                                <DaysFromWriting reply={r} />
+                              </div>
+
+                              <div className="desktop-view">
+                                <AnswerToReply
+                                  setReplyForm={setReplyForm}
+                                  reply={r}
+                                  currentUser={currentUser}
+                                  handlePlusScore={handlePlusScore}
+                                  handleMinusScore={handleMinusScore}
+                                  setDeleteCommentId={setDeleteCommentId}
+                                  setDeleteId={setDeleteId}
+                                  setEditText={setEditText}
+                                />
+                              </div>
+                            </div>
+
+                            {editText === r.id ? (
+                              <form onSubmit={handleReplySubmit}>
+                                <textarea
+                                  style={{ marginTop: "10px" }}
+                                  value={
+                                    updateTextContent === ""
+                                      ? r.content
+                                      : updateTextContent
+                                  }
+                                  onChange={({ target }) =>
+                                    setUpdateTextContent(target.value)
+                                  }
+                                >
+                                  {r.content}
+                                </textarea>
+                                <div className="update-btn-layout">
+                                  <button type="submit" className="send-btn">
+                                    update
+                                  </button>
+                                </div>
+                              </form>
                             ) : (
-                              <></>
+                              <div>
+                                <p>
+                                  <span
+                                    style={{
+                                      color: "hsl(238, 40%, 52%)",
+                                      padding: " 0 5px 0 0",
+                                    }}
+                                  >
+                                    {r.replyingTo}@
+                                  </span>
+                                  {r.content}
+                                </p>
+                              </div>
                             )}
                           </div>
-                          <div style={{ padding: "0 10px" }}>
-                            <DaysFromWriting reply={c} />
-                          </div>
-
-                          <div className="desktop-view">
-                            <AnswerToReply
-                              setReplyForm={setReplyForm}
-                              reply={r}
-                              currentUser={currentUser}
-                              handlePlusScore={handlePlusScore}
-                              handleMinusScore={handleMinusScore}
-                              setDeleteCommentId={setDeleteCommentId}
-                              setDeleteId={setDeleteId}
-                            />
-                          </div>
                         </div>
-                        <p>
-                          <span
-                            style={{
-                              color: "hsl(238, 40%, 52%)",
-                              padding: " 0 5px 0 0",
-                            }}
-                          >
-                            {r.replyingTo}@
-                          </span>
-                          {r.content}
-                        </p>
+
                         <div className="mobile-view">
                           <AnswerToReply
                             setReplyForm={setReplyForm}
@@ -194,6 +309,7 @@ const AllComments = ({
                             handleMinusScore={handleMinusScore}
                             setDeleteCommentId={setDeleteCommentId}
                             setDeleteId={setDeleteId}
+                            setEditText={setEditText}
                           />
                         </div>
                       </div>
@@ -244,130 +360,5 @@ const AllComments = ({
     </div>
   );
 };
-
-type ReplyProps = {
-  setReplyForm: React.Dispatch<
-    React.SetStateAction<{ username: string; command_id: number }>
-  >;
-  reply: Replies | Comments;
-  currentUser: UserInfo | undefined;
-  handlePlusScore: (event: React.FormEvent<HTMLButtonElement>) => void;
-  handleMinusScore: (event: React.FormEvent<HTMLButtonElement>) => void;
-  setDeleteCommentId: React.Dispatch<React.SetStateAction<number>>;
-  setDeleteId: React.Dispatch<React.SetStateAction<number>>;
-};
-
-const AnswerToReply = ({
-  setReplyForm,
-  reply,
-  currentUser,
-  handlePlusScore,
-  handleMinusScore,
-  setDeleteCommentId,
-  setDeleteId
-}: ReplyProps) => {
-
-  const handleDeleteModal = (reply: Replies | Comments) => {
-    const modal = document.getElementById("myModal");
-   
-    if ("id" in reply ) {
-        setDeleteId(Number(reply.id));
-    }
-    else if ("comment_id" in reply) {
-      setDeleteCommentId(Number(reply.comment_id))
-    } else {
-      console.log("do delete comment action here!");
-      
-    }
-    
-
-    if (modal) {
-      modal.style.display = "block";
-    }
-  };
-
-
-
-  return (
-    <>
-      <div className="mobile-view">
-        <div className="layout-direction-row score-style">
-          <button
-            className="score-btn"
-            value={reply.username}
-            onClick={handlePlusScore}
-          >
-            +
-          </button>
-          {reply.score}
-          <button
-            className="score-btn"
-            value={reply.username}
-            onClick={handleMinusScore}
-          >
-            -
-          </button>
-        </div>
-      </div>
-      <div className="reply-btn-layout">
-        {reply.username !== currentUser?.username ? (
-          <button
-            className="reply-btn"
-            // value={replyForm}
-            onClick={() =>
-              setReplyForm(
-                reply?.username
-                  ? { username: reply.username, command_id: reply.comment_id }
-                  : { username: "", command_id: -1 }
-              )
-            }
-          >
-            <img src={replyIcon} alt="reply icon" className="reply-img" />
-            Reply
-          </button>
-        ) : (
-          <>
-            <button
-              className="delete-btn"
-              onClick={() => handleDeleteModal(reply)}
-            >
-              <img src={deleteIcon} alt="delete icon" className="delete-img" />
-              Delete
-            </button>
-            <button className="reply-btn">
-              <img src={editIcon} alt="edit icon" className="reply-img" />
-              Edit
-            </button>
-          </>
-        )}
-      </div>
-    </>
-  );
-};
-
-type DaysProps = {
-  reply: Comments | Replies;
-};
-
-const DaysFromWriting = ({ reply }: DaysProps) => {
-  const calculateTime = () => {
-    const now = new Date();
-    const createdAt = new Date(Number(reply.createdAt));
-
-    return formatDistance(createdAt, now, { addSuffix: true });
-  };
-
-  const [time, setTime] = useState(calculateTime());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTime(calculateTime());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return <>{time}</>;
-};
-
 
 export default AllComments;

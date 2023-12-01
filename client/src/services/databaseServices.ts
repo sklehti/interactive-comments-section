@@ -30,6 +30,22 @@ export const createComment = (comment: Replies) =>
       console.log(error);
     });
 
+export const updateComment = (content: string, id: number) =>
+  axios
+    .put(`${baseUrl}/updateComment`, { content, id })
+    .then((response) => response.data)
+    .catch(function (error) {
+      console.log(error);
+    });
+
+export const updateReplies = (content: string, id: number) =>
+  axios
+    .put(`${baseUrl}/updateReplies`, { content, id })
+    .then((response) => response.data)
+    .catch(function (error) {
+      console.log(error);
+    });
+
 export const deleteReplies = (id: number) =>
   axios
     .delete<Replies[]>(`${baseUrl}/replies/${id}`)

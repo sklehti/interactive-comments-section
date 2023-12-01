@@ -6,14 +6,14 @@ import {
   getComments,
   getReplies,
   deleteReplies,
-  deleteComment
+  deleteComment,
 } from "./services/databaseServices";
 import AllComments from "./components/AllComments";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<UserInfo>();
   const [allComments, setAllComments] = useState<Comments[]>([]);
-  const [deleteCommentId,setDeleteCommentId] = useState(-1);
+  const [deleteCommentId, setDeleteCommentId] = useState(-1);
   const [deleteId, setDeleteId] = useState(-1);
 
   const [allUser, setAllUser] = useState<UserInfo[]>([]);
@@ -21,25 +21,14 @@ function App() {
 
   const modal = document.getElementById("myModal");
 
-  // useEffect(() => {
-  //   getAllUsers.then((response) => {
-  //     setCurrentUser(response);
-  //      console.log(response);
-  //     setAllComments(response[0].comments);
-  //   });
-  // }, []);
-
-
-
   useEffect(() => {
-     getAllUsers().then((response) => {
+    getAllUsers().then((response) => {
       setAllUser(response);
-      
 
       response.map((r) => {
         return r.admin === 1 ? setCurrentUser(r) : "";
       });
-    }); 
+    });
 
     getComments().then((response) => {
       setAllComments(response);
@@ -50,16 +39,6 @@ function App() {
     });
   }, [setAllUser, deleteCommentId, deleteId]);
 
-  // useEffect(() => {
-  //   if (modal) {
-  //     window.onclick = function (event) {
-  //       if (event.target == modal) {
-  //         modal.style.display = "none";
-  //       }
-  //     };
-  //   }
-  // }, [modal]);
-
   const handleCancel = () => {
     if (modal) {
       modal.style.display = "none";
@@ -68,21 +47,17 @@ function App() {
 
   const handleDelete = () => {
     if (deleteId > -1) {
-      deleteReplies(deleteId).then(result => {
+      deleteReplies(deleteId).then((result) => {
         console.log(result);
 
         setDeleteId(-1);
-
-      })
+      });
     } else if (deleteCommentId > -1) {
-      
-      deleteComment(deleteCommentId).then(result => {
+      deleteComment(deleteCommentId).then((result) => {
         console.log(result);
 
         setDeleteCommentId(-1);
-
-      })
-      
+      });
     }
 
     if (modal) {
