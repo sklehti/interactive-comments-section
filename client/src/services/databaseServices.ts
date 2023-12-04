@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Comments, Comment, Replies, UserInfo } from "../types";
+import { Comments, Comment, Replies, UserInfo, Score } from "../types";
 
 const baseUrl = "http://localhost:3001/api/database";
 
@@ -13,6 +13,9 @@ export const getComments = () =>
 
 export const getReplies = () =>
   axios.get<Replies[]>(`${baseUrl}/replies`).then((response) => response.data);
+
+export const scores = (scoreInfo: Score) =>
+  axios.post(`${baseUrl}/scores`, scoreInfo).then((response) => response.data);
 
 export const createNewAdminComment = (newComment: Comment) =>
   axios
@@ -33,6 +36,22 @@ export const createComment = (comment: Replies) =>
 export const updateComment = (content: string, id: number) =>
   axios
     .put(`${baseUrl}/updateComment`, { content, id })
+    .then((response) => response.data)
+    .catch(function (error) {
+      console.log(error);
+    });
+
+export const createScore = (newScore: Score) =>
+  axios
+    .post(`${baseUrl}/addScore`, newScore)
+    .then((response) => response.data)
+    .catch(function (error) {
+      console.log(error);
+    });
+
+export const updateScore = (newScore: Score) =>
+  axios
+    .put(`${baseUrl}/removeScore`, newScore)
     .then((response) => response.data)
     .catch(function (error) {
       console.log(error);

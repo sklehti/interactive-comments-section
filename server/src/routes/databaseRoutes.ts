@@ -14,8 +14,6 @@ databaseRouter.get("/allUsers", (_req, res) => {
 
 databaseRouter.get("/", (_req, res) => {
   const sql = "SELECT * FROM users u, comments c WHERE u.user_id = c.user_id";
-  // const sql =
-  //   "SELECT * FROM comments c, replies r WHERE c.comment_id = r.comment_id";
 
   connection.query(sql, (err, result) => {
     if (err) throw err;
@@ -74,6 +72,21 @@ databaseRouter.post("/replies", (req, res) => {
   });
 });
 
+// check if rigth score already exists
+databaseRouter.post("/scores", (req, res) => {
+  const sql =
+    "SELECT * FROM scores WHERE comment_id=? AND user_id=? AND comment_type=?";
+
+  connection.query(
+    sql,
+    [req.body.comment_id, req.body.user_id, req.body.comment_type],
+    (err, result) => {
+      if (err) throw err;
+      res.send(result);
+    }
+  );
+});
+
 databaseRouter.post("/newComment", (req, res) => {
   const sql =
     "INSERT INTO comments (`content`, `createdAt`, `score`, `user_id`, `replies`) VALUES (?,?,?,?,?)";
@@ -93,6 +106,72 @@ databaseRouter.post("/newComment", (req, res) => {
       res.send(result);
     }
   );
+});
+
+// add a point to the comment/replies table
+databaseRouter.post("/addScore", (req, res) => {
+  let sql;
+
+  if (req.body.comment_type === "c") {
+    sql = "UPDATE comments SET score = score + 1 WHERE comment_id=?";
+  } else {
+    sql = "UPDATE replies SET score = score + 1 WHERE id=?";
+  }
+
+  const sql2 =
+    "INSERT INTO scores (`comment_id`, `user_id`, `comment_type`) VALUES (?,?,?)";
+
+  connection.query(sql, [req.body.comment_id], (err, result2) => {
+    if (err) throw err;
+
+    console.log(result2);
+
+    connection.query(
+      sql2,
+      [req.body.comment_id, req.body.user_id, req.body.comment_type],
+      (err, result3) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send(err);
+          return;
+        }
+        res.send(result3);
+      }
+    );
+  });
+});
+
+// remove a point to the comment/replies table
+databaseRouter.put("/removeScore", (req, res) => {
+  let sql;
+
+  if (req.body.comment_type === "c") {
+    sql = "UPDATE comments SET score = score - 1 WHERE comment_id=?";
+  } else {
+    sql = "UPDATE replies SET score = score - 1 WHERE id=?";
+  }
+
+  const sql2 =
+    "DELETE FROM scores WHERE comment_id=? AND user_id=? AND comment_type=?";
+
+  connection.query(sql, [req.body.comment_id], (err, result2) => {
+    if (err) throw err;
+
+    console.log(result2);
+
+    connection.query(
+      sql2,
+      [req.body.comment_id, req.body.user_id, req.body.comment_type],
+      (err, result3) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send(err);
+          return;
+        }
+        res.send(result3);
+      }
+    );
+  });
 });
 
 // update comments content

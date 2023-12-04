@@ -9,6 +9,7 @@ import {
   updateReplies,
 } from "../services/databaseServices";
 import AnswerToReply from "./AnswerToReply";
+import ScoreActions from "./ScoreActions";
 
 type Props = {
   allComments: Comments[];
@@ -34,16 +35,6 @@ const AllComments = ({
   const [replyForm, setReplyForm] = useState({ username: "", command_id: -1 });
   const [editText, setEditText] = useState(-1);
   const [updateTextContent, setUpdateTextContent] = useState("");
-
-  const handlePlusScore = (event: React.FormEvent<HTMLButtonElement>) => {
-    if (event.currentTarget.value !== currentUser?.username)
-      console.log("lisää piste", event.currentTarget);
-  };
-
-  const handleMinusScore = (event: React.FormEvent<HTMLButtonElement>) => {
-    if (event.currentTarget.value !== currentUser?.username)
-      console.log("vähennä piste", event.currentTarget);
-  };
 
   const handleUpdateContentSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -78,25 +69,12 @@ const AllComments = ({
           <div className="content-style">
             <div className="layout-direction-row">
               <div className="desktop-view">
-                <div className="score-layout">
-                  <div className="layout-direction-column score-style">
-                    <button
-                      className="score-btn"
-                      value={c.username}
-                      onClick={handlePlusScore}
-                    >
-                      +
-                    </button>
-                    {c.score}
-                    <button
-                      className="score-btn"
-                      value={c.username}
-                      onClick={handleMinusScore}
-                    >
-                      -
-                    </button>
-                  </div>
-                </div>
+                <ScoreActions
+                  c={c}
+                  currentUser={currentUser}
+                  setAllComments={setAllComments}
+                  setReplies={setReplies}
+                />
               </div>
 
               <div
@@ -126,11 +104,11 @@ const AllComments = ({
                       setReplyForm={setReplyForm}
                       reply={c}
                       currentUser={currentUser}
-                      handlePlusScore={handlePlusScore}
-                      handleMinusScore={handleMinusScore}
                       setDeleteCommentId={setDeleteCommentId}
                       setDeleteId={setDeleteId}
                       setEditText={setEditText}
+                      setAllComments={setAllComments}
+                      setReplies={setReplies}
                     />
                   </div>
                 </div>
@@ -167,11 +145,11 @@ const AllComments = ({
                 setReplyForm={setReplyForm}
                 reply={c}
                 currentUser={currentUser}
-                handlePlusScore={handlePlusScore}
-                handleMinusScore={handleMinusScore}
                 setDeleteCommentId={setDeleteCommentId}
                 setDeleteId={setDeleteId}
                 setEditText={setEditText}
+                setAllComments={setAllComments}
+                setReplies={setReplies}
               />
             </div>
           </div>
@@ -206,25 +184,12 @@ const AllComments = ({
                       <div className="content-style">
                         <div className="layout-direction-row">
                           <div className="desktop-view">
-                            <div className="score-layout">
-                              <div className="layout-direction-column score-style">
-                                <button
-                                  className="score-btn"
-                                  value={r.username}
-                                  onClick={handlePlusScore}
-                                >
-                                  +
-                                </button>
-                                {r.score}
-                                <button
-                                  className="score-btn"
-                                  value={r.username}
-                                  onClick={handleMinusScore}
-                                >
-                                  -
-                                </button>
-                              </div>
-                            </div>
+                            <ScoreActions
+                              c={r}
+                              currentUser={currentUser}
+                              setAllComments={setAllComments}
+                              setReplies={setReplies}
+                            />
                           </div>
 
                           <div
@@ -252,11 +217,11 @@ const AllComments = ({
                                   setReplyForm={setReplyForm}
                                   reply={r}
                                   currentUser={currentUser}
-                                  handlePlusScore={handlePlusScore}
-                                  handleMinusScore={handleMinusScore}
                                   setDeleteCommentId={setDeleteCommentId}
                                   setDeleteId={setDeleteId}
                                   setEditText={setEditText}
+                                  setAllComments={setAllComments}
+                                  setReplies={setReplies}
                                 />
                               </div>
                             </div>
@@ -305,11 +270,11 @@ const AllComments = ({
                             setReplyForm={setReplyForm}
                             reply={r}
                             currentUser={currentUser}
-                            handlePlusScore={handlePlusScore}
-                            handleMinusScore={handleMinusScore}
                             setDeleteCommentId={setDeleteCommentId}
                             setDeleteId={setDeleteId}
                             setEditText={setEditText}
+                            setAllComments={setAllComments}
+                            setReplies={setReplies}
                           />
                         </div>
                       </div>

@@ -56,3 +56,10 @@ export interface Replies {
   image_png: string;
   replyingToUserId: number | undefined;
 }
+
+export interface Score {
+  id?: number;
+  comment_id: number;
+  user_id: number;
+  comment_type: string;
+}
