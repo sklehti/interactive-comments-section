@@ -6,6 +6,7 @@ import {
   getComments,
   getReplies,
 } from "../services/databaseServices";
+import { toNewReplies, toNewComment } from "../utils";
 
 type Props = {
   currentUser: UserInfo | undefined;
@@ -38,52 +39,62 @@ const AddComment = ({
     const dateObject = new Date();
 
     if (currentUser) {
-      const comment = {
-        content: text,
-        createdAt: dateObject,
-        score: 0,
-        username: currentUser.username,
-        image_png: currentUser.image_png,
-        replyingToUserId: replyingToUserId === undefined ? 0 : replyingToUserId,
-      };
-
-      // answer to replies
-      if (comment_id && userName) {
-        const replies: Replies = {
-          ...comment,
-          user_id: currentUser.user_id,
-          comment_id: comment_id,
-          replyingTo: userName,
-        };
-
-        createComment(replies).then((response) => {
-          console.log(response, "Reply created");
-
-          getReplies().then((response) => {
-            setReplies(response);
-          });
-        });
-
-        // create comment by admin
+      if (text.length < 1) {
+        alert("Comment field cannot be empty.");
       } else {
-        const newComment: Comment = {
-          content: comment.content,
-          user_id: currentUser.user_id,
+        const comment = {
+          content: text,
           createdAt: dateObject,
+          score: 0,
+          username: currentUser.username,
+          image_png: currentUser.image_png,
+          image_webp: currentUser.image_webp,
+          replyingToUserId:
+            replyingToUserId === undefined ? 0 : replyingToUserId,
         };
 
-        createNewAdminComment(newComment).then((response) => {
-          console.log(response, "Reply created");
+        // answer to replies
+        if (comment_id && userName) {
+          const replies: Replies = {
+            ...comment,
+            user_id: currentUser.user_id,
+            comment_id: comment_id,
+            replyingTo: userName,
+          };
 
-          getComments().then((response) => {
-            setAllComments(response);
+          const newReply = toNewReplies(replies);
+
+          createComment(newReply).then((response) => {
+            console.log(response, "Reply created");
+
+            getReplies().then((response) => {
+              setReplies(response);
+            });
           });
-        });
+
+          // create comment by admin
+        } else {
+          const createdComment: Comment = {
+            content: comment.content,
+            user_id: currentUser.user_id,
+            createdAt: dateObject,
+          };
+
+          const newComment = toNewComment(createdComment);
+
+          createNewAdminComment(newComment).then((response) => {
+            console.log(response, "Reply created");
+
+            getComments().then((response) => {
+              setAllComments(response);
+            });
+          });
+        }
+        setText("");
+        setReplyForm({ username: "", command_id: -1 });
       }
-      setText("");
-      setReplyForm({ username: "", command_id: -1 });
     } else {
-      console.log("Jokin meni pieleen. Yritä uudestaan.");
+      alert("Something went wrong. Try again.");
     }
   };
 

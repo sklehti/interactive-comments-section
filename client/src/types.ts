@@ -1,4 +1,3 @@
-// NOTE! Update server side types.ts
 export interface AllUsers {
   id?: number;
   comments: Comments[];
@@ -54,7 +53,8 @@ export interface Replies {
   comment_id: number;
   username: string;
   image_png: string;
-  replyingToUserId: number | undefined;
+  image_webp: string;
+  replyingToUserId?: number;
 }
 
 export interface Score {
