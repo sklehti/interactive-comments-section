@@ -1,6 +1,8 @@
 import express from "express";
 // import usersCommentsService from "../services/usersCommentsService";
 import { connection } from "../../config/db";
+import { parseDate, toNewScore, toNewReplies, toNewComment } from "../utils";
+
 const databaseRouter = express.Router();
 
 databaseRouter.get("/allUsers", (_req, res) => {
@@ -57,19 +59,20 @@ databaseRouter.post("/replies", (req, res) => {
       return;
     }
 
-    const date: Date = req.body.createdAt as Date;
-    const date2 = new Date(date);
+    const newReply = toNewReplies(req.body);
+    const newDate = parseDate(req.body.createdAt);
+    const date2 = new Date(newDate);
 
     connection.query(
       sql2,
       [
-        req.body.content,
+        newReply.content,
         date2.valueOf(),
-        req.body.score,
-        req.body.user_id,
-        req.body.comment_id,
-        req.body.replyingTo,
-        req.body.replyingToUserId,
+        newReply.score,
+        newReply.user_id,
+        newReply.comment_id,
+        newReply.replyingTo,
+        newReply.replyingToUserId,
       ],
       (err, result) => {
         if (err) {
@@ -91,6 +94,7 @@ databaseRouter.post("/scores", (req, res) => {
   connection.query(
     sql,
     [req.body.comment_id, req.body.user_id, req.body.comment_type],
+
     (err, result) => {
       if (err) {
         console.error(err);
@@ -107,12 +111,13 @@ databaseRouter.post("/newComment", (req, res) => {
   const sql =
     "INSERT INTO comments (`content`, `createdAt`, `score`, `user_id`, `replies`) VALUES (?,?,?,?,?)";
 
-  const date: Date = req.body.createdAt as Date;
-  const date2 = new Date(date);
+  const newComment = toNewComment(req.body);
+  const newDate = parseDate(req.body.createdAt);
+  const date2 = new Date(newDate);
 
   connection.query(
     sql,
-    [req.body.content, date2.valueOf(), 0, req.body.user_id, 0],
+    [newComment.content, date2.valueOf(), 0, newComment.user_id, 0],
     (err, result) => {
       if (err) {
         console.error(err);
@@ -137,6 +142,8 @@ databaseRouter.post("/addScore", (req, res) => {
   const sql2 =
     "INSERT INTO scores (`comment_id`, `user_id`, `comment_type`) VALUES (?,?,?)";
 
+  const newScore = toNewScore(req.body);
+
   connection.query(sql, [req.body.comment_id], (err) => {
     if (err) {
       console.error(err);
@@ -146,7 +153,7 @@ databaseRouter.post("/addScore", (req, res) => {
 
     connection.query(
       sql2,
-      [req.body.comment_id, req.body.user_id, req.body.comment_type],
+      [newScore.comment_id, newScore.user_id, newScore.comment_type],
       (err, result3) => {
         if (err) {
           console.error(err);
@@ -172,6 +179,8 @@ databaseRouter.put("/removeScore", (req, res) => {
   const sql2 =
     "DELETE FROM scores WHERE comment_id=? AND user_id=? AND comment_type=?";
 
+  const newScore = toNewScore(req.body);
+
   connection.query(sql, [req.body.comment_id], (err) => {
     if (err) {
       console.error(err);
@@ -181,7 +190,7 @@ databaseRouter.put("/removeScore", (req, res) => {
 
     connection.query(
       sql2,
-      [req.body.comment_id, req.body.user_id, req.body.comment_type],
+      [newScore.comment_id, newScore.user_id, newScore.comment_type],
       (err, result3) => {
         if (err) {
           console.error(err);
