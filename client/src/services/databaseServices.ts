@@ -66,11 +66,7 @@ export const updateReplies = (content: string, id: number) =>
     });
 
 export const deleteReplies = (id: number) =>
-  axios
-    .delete<Replies[]>(`${baseUrl}/replies/${id}`)
-    .then((response) => response.data);
+  axios.delete(`${baseUrl}/replies/${id}`).then((response) => response.data);
 
 export const deleteComment = (id: number) =>
-  axios
-    .delete<Comments[]>(`${baseUrl}/comments/${id}`)
-    .then((response) => response.data);
+  axios.delete(`${baseUrl}/comments/${id}`).then((response) => response.data);

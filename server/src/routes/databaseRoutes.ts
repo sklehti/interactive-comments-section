@@ -198,6 +198,7 @@ databaseRouter.put("/updateReplies", (req, res) => {
       res.status(500).send(err);
       return;
     }
+
     res.send(result);
   });
 });
@@ -206,10 +207,14 @@ databaseRouter.put("/updateReplies", (req, res) => {
 databaseRouter.delete("/replies/:id", (req, res) => {
   const sql = "DELETE FROM replies WHERE id=?";
 
-  connection.query(sql, [req.params.id], (err) => {
-    if (err) throw err;
+  connection.query(sql, [req.params.id], (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send(err);
+      return;
+    }
 
-    res.send({ status: 200 });
+    res.send(result);
   });
 });
 
@@ -217,10 +222,14 @@ databaseRouter.delete("/replies/:id", (req, res) => {
 databaseRouter.delete("/comments/:id", (req, res) => {
   const sql = "DELETE FROM comments WHERE comment_id=?";
 
-  connection.query(sql, [req.params.id], (err) => {
-    if (err) throw err;
+  connection.query(sql, [req.params.id], (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send(err);
+      return;
+    }
 
-    res.send({ status: 200 });
+    res.send(result);
   });
 });
 

@@ -1,4 +1,5 @@
-body {
+body,
+html {
   width: 100%;
   margin: 0;
   padding: 0;
@@ -12,6 +13,36 @@ body {
 .app {
   max-width: 700px;
   padding: 0 20px;
+}
+
+.error-modal {
+  position: fixed;
+  z-index: 1;
+  padding-top: 35vh;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.error-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  border-radius: 10px;
+  width: 80vw;
+  display: flex;
+  justify-content: center;
+}
+
+.error-img {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .desktop-view {
@@ -226,20 +257,20 @@ span {
 .modal-content {
   background-color: #fefefe;
   margin: auto;
-  padding: 20px;
+  padding: 30px;
   border: 1px solid #888;
   border-radius: 10px;
-  width: 240px;
+  width: 280px;
   color: #444343;
+  font-size: 16px;
 }
 
 .modal-btn {
   border: none;
   border-radius: 4px;
   color: #fff;
-  padding: 7px 15px;
+  padding: 10px 20px;
   margin: 20px 0 0 0;
-  font-size: 12px;
   cursor: pointer;
   text-transform: uppercase;
 }
@@ -294,13 +325,14 @@ span {
   }
 }
 
-@media screen and (max-width: 330px) {
+@media screen and (max-width: 360px) {
   .modal-content {
-    width: 200px;
+    width: 220px;
+    padding: 20px;
   }
 
   .modal-btn {
-    font-size: 11px;
+    font-size: 12px;
     padding: 7px 10px;
   }
 }

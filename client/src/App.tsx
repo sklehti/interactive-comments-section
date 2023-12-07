@@ -9,6 +9,8 @@ import {
   deleteComment,
 } from "./services/databaseServices";
 import AllComments from "./components/AllComments";
+import ErrorHandling from "./components/ErrorHandling";
+import axios, { AxiosError } from "axios";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<UserInfo>();
@@ -18,25 +20,66 @@ function App() {
 
   const [allUser, setAllUser] = useState<UserInfo[]>([]);
   const [replies, setReplies] = useState<Replies[]>([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const modal = document.getElementById("myModal");
 
   useEffect(() => {
-    getAllUsers().then((response) => {
-      setAllUser(response);
+    getAllUsers()
+      .then((response) => {
+        setAllUser(response);
 
-      response.map((r) => {
-        return r.admin === 1 ? setCurrentUser(r) : "";
+        response.map((r) => {
+          return r.admin === 1 ? setCurrentUser(r) : "";
+        });
+      })
+      .catch((error) => {
+        if (error.response) {
+          setErrorMessage(
+            "Data :" + error.response.data + "\n" + error.response.status
+          );
+        } else if (error.request) {
+          setErrorMessage("The request was made but no response was received");
+        } else {
+          setErrorMessage("Error: " + error.message);
+        }
       });
-    });
 
-    getComments().then((response) => {
-      setAllComments(response);
-    });
+    getComments()
+      .then((response) => {
+        setAllComments(response);
+        setErrorMessage("");
+      })
+      .catch((error) => {
+        if (error.response) {
+          setErrorMessage(
+            "Data :" + error.response.data + "\n" + error.response.status
+          );
+        } else if (error.request) {
+          setErrorMessage("The request was made but no response was received");
+        } else {
+          setErrorMessage("Error: " + error.message);
+        }
+      });
 
-    getReplies().then((response) => {
-      setReplies(response);
-    });
+    getReplies()
+      .then((response) => {
+        setReplies(response);
+        setErrorMessage("");
+      })
+      .catch((error) => {
+        if (error.response) {
+          setErrorMessage(
+            "Data :" + error.response.data + "\n" + error.response.status
+          );
+        } else if (error.request) {
+          setErrorMessage(
+            "Error: The request was made but no response was received."
+          );
+        } else {
+          setErrorMessage("Error: " + error.message);
+        }
+      });
   }, [setAllUser, deleteCommentId, deleteId]);
 
   const handleCancel = () => {
@@ -48,14 +91,11 @@ function App() {
   const handleDelete = () => {
     if (deleteId > -1) {
       deleteReplies(deleteId).then((result) => {
-        console.log(result);
-
         setDeleteId(-1);
+        console.log(result);
       });
     } else if (deleteCommentId > -1) {
-      deleteComment(deleteCommentId).then((result) => {
-        console.log(result);
-
+      deleteComment(deleteCommentId).then(() => {
         setDeleteCommentId(-1);
       });
     }
@@ -67,43 +107,49 @@ function App() {
 
   return (
     <div className="app">
-      <div id="myModal" className="modal">
-        <div className="modal-content">
-          <h4>Delete comment</h4>
-          <p>
-            Are you sure you want to delete this comment? This will remove the
-            comment and can&apos;t be undone.
-          </p>
-          <div
-            className="layout-direction-row"
-            style={{ justifyContent: "space-between" }}
-          >
-            <button
-              className="modal-btn modal-cancel-btn"
-              onClick={handleCancel}
-            >
-              No, cancel
-            </button>
-            <button
-              className="modal-btn modal-delete-btn"
-              onClick={handleDelete}
-            >
-              Yes, delete
-            </button>
+      {errorMessage.length > 0 ? (
+        <ErrorHandling errorMessage={errorMessage} />
+      ) : (
+        <>
+          <div id="myModal" className="modal">
+            <div className="modal-content">
+              <h4>Delete comment</h4>
+              <p>
+                Are you sure you want to delete this comment? This will remove
+                the comment and can&apos;t be undone.
+              </p>
+              <div
+                className="layout-direction-row"
+                style={{ justifyContent: "space-between" }}
+              >
+                <button
+                  className="modal-btn modal-cancel-btn"
+                  onClick={handleCancel}
+                >
+                  No, cancel
+                </button>
+                <button
+                  className="modal-btn modal-delete-btn"
+                  onClick={handleDelete}
+                >
+                  Yes, delete
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <AllComments
-        allComments={allComments}
-        currentUser={currentUser}
-        allUsers={allUser}
-        replies={replies}
-        setAllComments={setAllComments}
-        setReplies={setReplies}
-        setDeleteCommentId={setDeleteCommentId}
-        setDeleteId={setDeleteId}
-      />
+          <AllComments
+            allComments={allComments}
+            currentUser={currentUser}
+            allUsers={allUser}
+            replies={replies}
+            setAllComments={setAllComments}
+            setReplies={setReplies}
+            setDeleteCommentId={setDeleteCommentId}
+            setDeleteId={setDeleteId}
+          />
+        </>
+      )}
     </div>
   );
 }
