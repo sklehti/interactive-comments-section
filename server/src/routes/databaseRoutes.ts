@@ -1,5 +1,4 @@
 import express from "express";
-// import usersCommentsService from "../services/usersCommentsService";
 import { connection } from "../../config/db";
 import { parseDate, toNewScore, toNewReplies, toNewComment } from "../utils";
 
@@ -111,9 +110,8 @@ databaseRouter.post("/newComment", (req, res) => {
   const sql =
     "INSERT INTO comments (`content`, `createdAt`, `score`, `user_id`, `replies`) VALUES (?,?,?,?,?)";
 
+  const date2 = new Date(parseDate(req.body.createdAt));
   const newComment = toNewComment(req.body);
-  const newDate = parseDate(req.body.createdAt);
-  const date2 = new Date(newDate);
 
   connection.query(
     sql,
@@ -142,14 +140,13 @@ databaseRouter.post("/addScore", (req, res) => {
   const sql2 =
     "INSERT INTO scores (`comment_id`, `user_id`, `comment_type`) VALUES (?,?,?)";
 
-  const newScore = toNewScore(req.body);
-
   connection.query(sql, [req.body.comment_id], (err) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
       return;
     }
+    const newScore = toNewScore(req.body);
 
     connection.query(
       sql2,
@@ -179,14 +176,14 @@ databaseRouter.put("/removeScore", (req, res) => {
   const sql2 =
     "DELETE FROM scores WHERE comment_id=? AND user_id=? AND comment_type=?";
 
-  const newScore = toNewScore(req.body);
-
   connection.query(sql, [req.body.comment_id], (err) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
       return;
     }
+
+    const newScore = toNewScore(req.body);
 
     connection.query(
       sql2,

@@ -4,31 +4,39 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-// import usersCommentsService from "../services/usersCommentsService";
 const db_1 = require("../../config/db");
+const utils_1 = require("../utils");
 const databaseRouter = express_1.default.Router();
 databaseRouter.get("/allUsers", (_req, res) => {
     const sql = "SELECT * FROM users";
     db_1.connection.query(sql, (err, result) => {
-        if (err)
-            throw err;
+        if (err) {
+            console.error(err);
+            res.status(500).send(err);
+            return;
+        }
         res.send(result);
     });
 });
 databaseRouter.get("/", (_req, res) => {
     const sql = "SELECT * FROM users u, comments c WHERE u.user_id = c.user_id";
     db_1.connection.query(sql, (err, result) => {
-        if (err)
-            throw err;
+        if (err) {
+            console.error(err);
+            res.status(500).send(err);
+            return;
+        }
         res.send(result);
     });
 });
 databaseRouter.get("/replies", (_req, res) => {
     const sql = "SELECT * FROM replies r, users u WHERE u.user_id = r.user_id ORDER BY CASE WHEN r.replyingToUserId > 0 THEN r.replyingToUserId ELSE r.id END ASC";
     db_1.connection.query(sql, (err, result) => {
-        //console.log(result);
-        if (err)
-            throw err;
+        if (err) {
+            console.error(err);
+            res.status(500).send(err);
+            return;
+        }
         res.send(result);
     });
 });
@@ -41,16 +49,17 @@ databaseRouter.post("/replies", (req, res) => {
             res.status(500).send(err);
             return;
         }
-        const date = req.body.createdAt;
-        const date2 = new Date(date);
+        const newReply = (0, utils_1.toNewReplies)(req.body);
+        const newDate = (0, utils_1.parseDate)(req.body.createdAt);
+        const date2 = new Date(newDate);
         db_1.connection.query(sql2, [
-            req.body.content,
+            newReply.content,
             date2.valueOf(),
-            req.body.score,
-            req.body.user_id,
-            req.body.comment_id,
-            req.body.replyingTo,
-            req.body.replyingToUserId,
+            newReply.score,
+            newReply.user_id,
+            newReply.comment_id,
+            newReply.replyingTo,
+            newReply.replyingToUserId,
         ], (err, result) => {
             if (err) {
                 console.error(err);
@@ -65,16 +74,19 @@ databaseRouter.post("/replies", (req, res) => {
 databaseRouter.post("/scores", (req, res) => {
     const sql = "SELECT * FROM scores WHERE comment_id=? AND user_id=? AND comment_type=?";
     db_1.connection.query(sql, [req.body.comment_id, req.body.user_id, req.body.comment_type], (err, result) => {
-        if (err)
-            throw err;
+        if (err) {
+            console.error(err);
+            res.status(500).send(err);
+            return;
+        }
         res.send(result);
     });
 });
 databaseRouter.post("/newComment", (req, res) => {
     const sql = "INSERT INTO comments (`content`, `createdAt`, `score`, `user_id`, `replies`) VALUES (?,?,?,?,?)";
-    const date = req.body.createdAt;
-    const date2 = new Date(date);
-    db_1.connection.query(sql, [req.body.content, date2.valueOf(), 0, req.body.user_id, 0], (err, result) => {
+    const date2 = new Date((0, utils_1.parseDate)(req.body.createdAt));
+    const newComment = (0, utils_1.toNewComment)(req.body);
+    db_1.connection.query(sql, [newComment.content, date2.valueOf(), 0, newComment.user_id, 0], (err, result) => {
         if (err) {
             console.error(err);
             res.status(500).send(err);
@@ -93,11 +105,14 @@ databaseRouter.post("/addScore", (req, res) => {
         sql = "UPDATE replies SET score = score + 1 WHERE id=?";
     }
     const sql2 = "INSERT INTO scores (`comment_id`, `user_id`, `comment_type`) VALUES (?,?,?)";
-    db_1.connection.query(sql, [req.body.comment_id], (err, result2) => {
-        if (err)
-            throw err;
-        console.log(result2);
-        db_1.connection.query(sql2, [req.body.comment_id, req.body.user_id, req.body.comment_type], (err, result3) => {
+    db_1.connection.query(sql, [req.body.comment_id], (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send(err);
+            return;
+        }
+        const newScore = (0, utils_1.toNewScore)(req.body);
+        db_1.connection.query(sql2, [newScore.comment_id, newScore.user_id, newScore.comment_type], (err, result3) => {
             if (err) {
                 console.error(err);
                 res.status(500).send(err);
@@ -117,11 +132,14 @@ databaseRouter.put("/removeScore", (req, res) => {
         sql = "UPDATE replies SET score = score - 1 WHERE id=?";
     }
     const sql2 = "DELETE FROM scores WHERE comment_id=? AND user_id=? AND comment_type=?";
-    db_1.connection.query(sql, [req.body.comment_id], (err, result2) => {
-        if (err)
-            throw err;
-        console.log(result2);
-        db_1.connection.query(sql2, [req.body.comment_id, req.body.user_id, req.body.comment_type], (err, result3) => {
+    db_1.connection.query(sql, [req.body.comment_id], (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send(err);
+            return;
+        }
+        const newScore = (0, utils_1.toNewScore)(req.body);
+        db_1.connection.query(sql2, [newScore.comment_id, newScore.user_id, newScore.comment_type], (err, result3) => {
             if (err) {
                 console.error(err);
                 res.status(500).send(err);
