@@ -1,5 +1,5 @@
 import React from "react";
-import { Comments, Replies, Score, UserInfo } from "../types";
+import { Comments, Replies, UserInfo } from "../types";
 import replyIcon from "./images/icon-reply.svg";
 import editIcon from "./images/icon-edit.svg";
 import deleteIcon from "./images/icon-delete.svg";
@@ -16,6 +16,8 @@ type ReplyProps = {
   setEditText: React.Dispatch<React.SetStateAction<number>>;
   setAllComments: React.Dispatch<React.SetStateAction<Comments[]>>;
   setReplies: React.Dispatch<React.SetStateAction<Replies[]>>;
+  setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
+  setHasStartedTyping: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const AnswerToReply = ({
@@ -27,6 +29,8 @@ const AnswerToReply = ({
   setEditText,
   setAllComments,
   setReplies,
+  setErrorMessage,
+  setHasStartedTyping,
 }: ReplyProps) => {
   const handleDeleteModal = (reply: Replies | Comments) => {
     const modal = document.getElementById("myModal");
@@ -47,6 +51,7 @@ const AnswerToReply = ({
   const handleContentEdit = () => {
     if ("id" in reply && reply.id !== undefined) {
       setEditText(reply.id);
+      setHasStartedTyping(false);
     } else {
       setEditText(reply.comment_id);
     }
@@ -66,6 +71,7 @@ const AnswerToReply = ({
                 setAllComments,
                 setReplies,
                 event,
+                setErrorMessage,
               })
             }
           >
@@ -83,6 +89,7 @@ const AnswerToReply = ({
                 setAllComments,
                 setReplies,
                 event,
+                setErrorMessage,
               })
             }
           >

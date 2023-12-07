@@ -8,6 +8,7 @@ import {
   updateComment,
   updateReplies,
 } from "../services/databaseServices";
+import { parseError } from "./ErrorFunction";
 import AnswerToReply from "./AnswerToReply";
 import ScoreActions from "./ScoreActions";
 
@@ -20,6 +21,7 @@ type Props = {
   setReplies: React.Dispatch<React.SetStateAction<Replies[]>>;
   setDeleteCommentId: React.Dispatch<React.SetStateAction<number>>;
   setDeleteId: React.Dispatch<React.SetStateAction<number>>;
+  setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const AllComments = ({
@@ -31,35 +33,60 @@ const AllComments = ({
   setReplies,
   setDeleteCommentId,
   setDeleteId,
+  setErrorMessage,
 }: Props) => {
   const [replyForm, setReplyForm] = useState({ username: "", command_id: -1 });
   const [editText, setEditText] = useState(-1);
   const [updateTextContent, setUpdateTextContent] = useState("");
+  const [hasStartedTyping, setHasStartedTyping] = useState(false);
 
   const handleUpdateContentSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    updateComment(updateTextContent, editText).then(() => {
-      getComments().then((response) => {
-        setAllComments(response);
+    updateComment(updateTextContent, editText)
+      .then(() => {
+        getComments()
+          .then((response) => {
+            setAllComments(response);
+          })
+          .catch((error) => {
+            setErrorMessage(parseError(error));
+            setTimeout(() => {
+              setErrorMessage("");
+            }, 3000);
+          });
+      })
+      .catch((error) => {
+        setErrorMessage(parseError(error));
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 3000);
       });
-    });
 
     setEditText(-1);
     setUpdateTextContent("");
+    setHasStartedTyping(false);
   };
 
   const handleReplySubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
 
     updateReplies(updateTextContent, editText).then(() => {
-      getReplies().then((response) => {
-        setReplies(response);
-      });
+      getReplies()
+        .then((response) => {
+          setReplies(response);
+        })
+        .catch((error) => {
+          setErrorMessage(parseError(error));
+          setTimeout(() => {
+            setErrorMessage("");
+          }, 3000);
+        });
     });
 
     setEditText(-1);
     setUpdateTextContent("");
+    setHasStartedTyping(false);
   };
 
   return (
@@ -74,6 +101,7 @@ const AllComments = ({
                   currentUser={currentUser}
                   setAllComments={setAllComments}
                   setReplies={setReplies}
+                  setErrorMessage={setErrorMessage}
                 />
               </div>
 
@@ -109,6 +137,8 @@ const AllComments = ({
                       setEditText={setEditText}
                       setAllComments={setAllComments}
                       setReplies={setReplies}
+                      setErrorMessage={setErrorMessage}
+                      setHasStartedTyping={setHasStartedTyping}
                     />
                   </div>
                 </div>
@@ -117,12 +147,11 @@ const AllComments = ({
                   <form onSubmit={handleUpdateContentSubmit}>
                     <textarea
                       style={{ marginTop: "10px" }}
-                      value={
-                        updateTextContent === "" ? c.content : updateTextContent
-                      }
-                      onChange={({ target }) =>
-                        setUpdateTextContent(target.value)
-                      }
+                      value={hasStartedTyping ? updateTextContent : c.content}
+                      onChange={({ target }) => {
+                        setUpdateTextContent(target.value);
+                        setHasStartedTyping(true);
+                      }}
                     >
                       {c.content}
                     </textarea>
@@ -150,6 +179,8 @@ const AllComments = ({
                 setEditText={setEditText}
                 setAllComments={setAllComments}
                 setReplies={setReplies}
+                setErrorMessage={setErrorMessage}
+                setHasStartedTyping={setHasStartedTyping}
               />
             </div>
           </div>
@@ -165,6 +196,7 @@ const AllComments = ({
                 setAllComments={setAllComments}
                 setReplies={setReplies}
                 replyingToUserId={0}
+                setErrorMessage={setErrorMessage}
               />
             </div>
           ) : (
@@ -189,6 +221,7 @@ const AllComments = ({
                               currentUser={currentUser}
                               setAllComments={setAllComments}
                               setReplies={setReplies}
+                              setErrorMessage={setErrorMessage}
                             />
                           </div>
 
@@ -222,6 +255,8 @@ const AllComments = ({
                                   setEditText={setEditText}
                                   setAllComments={setAllComments}
                                   setReplies={setReplies}
+                                  setErrorMessage={setErrorMessage}
+                                  setHasStartedTyping={setHasStartedTyping}
                                 />
                               </div>
                             </div>
@@ -231,13 +266,14 @@ const AllComments = ({
                                 <textarea
                                   style={{ marginTop: "10px" }}
                                   value={
-                                    updateTextContent === ""
-                                      ? r.content
-                                      : updateTextContent
+                                    hasStartedTyping
+                                      ? updateTextContent
+                                      : r.content
                                   }
-                                  onChange={({ target }) =>
-                                    setUpdateTextContent(target.value)
-                                  }
+                                  onChange={({ target }) => {
+                                    setUpdateTextContent(target.value);
+                                    setHasStartedTyping(true);
+                                  }}
                                 >
                                   {r.content}
                                 </textarea>
@@ -275,6 +311,8 @@ const AllComments = ({
                             setEditText={setEditText}
                             setAllComments={setAllComments}
                             setReplies={setReplies}
+                            setErrorMessage={setErrorMessage}
+                            setHasStartedTyping={setHasStartedTyping}
                           />
                         </div>
                       </div>
@@ -295,6 +333,7 @@ const AllComments = ({
                           setAllComments={setAllComments}
                           setReplies={setReplies}
                           replyingToUserId={r.id}
+                          setErrorMessage={setErrorMessage}
                         />
                       </div>
                     ) : (
@@ -320,6 +359,7 @@ const AllComments = ({
           setAllComments={setAllComments}
           setReplies={setReplies}
           replyingToUserId={0}
+          setErrorMessage={setErrorMessage}
         />
       </div>
     </div>

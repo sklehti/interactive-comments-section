@@ -7,7 +7,12 @@ databaseRouter.get("/allUsers", (_req, res) => {
   const sql = "SELECT * FROM users";
 
   connection.query(sql, (err, result) => {
-    if (err) throw err;
+    if (err) {
+      console.error(err);
+      res.status(500).send(err);
+      return;
+    }
+
     res.send(result);
   });
 });
@@ -16,7 +21,11 @@ databaseRouter.get("/", (_req, res) => {
   const sql = "SELECT * FROM users u, comments c WHERE u.user_id = c.user_id";
 
   connection.query(sql, (err, result) => {
-    if (err) throw err;
+    if (err) {
+      console.error(err);
+      res.status(500).send(err);
+      return;
+    }
 
     res.send(result);
   });
@@ -26,9 +35,11 @@ databaseRouter.get("/replies", (_req, res) => {
   const sql =
     "SELECT * FROM replies r, users u WHERE u.user_id = r.user_id ORDER BY CASE WHEN r.replyingToUserId > 0 THEN r.replyingToUserId ELSE r.id END ASC";
   connection.query(sql, (err, result) => {
-    //console.log(result);
-
-    if (err) throw err;
+    if (err) {
+      console.error(err);
+      res.status(500).send(err);
+      return;
+    }
 
     res.send(result);
   });
@@ -81,7 +92,12 @@ databaseRouter.post("/scores", (req, res) => {
     sql,
     [req.body.comment_id, req.body.user_id, req.body.comment_type],
     (err, result) => {
-      if (err) throw err;
+      if (err) {
+        console.error(err);
+        res.status(500).send(err);
+        return;
+      }
+
       res.send(result);
     }
   );
@@ -121,10 +137,12 @@ databaseRouter.post("/addScore", (req, res) => {
   const sql2 =
     "INSERT INTO scores (`comment_id`, `user_id`, `comment_type`) VALUES (?,?,?)";
 
-  connection.query(sql, [req.body.comment_id], (err, result2) => {
-    if (err) throw err;
-
-    console.log(result2);
+  connection.query(sql, [req.body.comment_id], (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send(err);
+      return;
+    }
 
     connection.query(
       sql2,
@@ -154,10 +172,12 @@ databaseRouter.put("/removeScore", (req, res) => {
   const sql2 =
     "DELETE FROM scores WHERE comment_id=? AND user_id=? AND comment_type=?";
 
-  connection.query(sql, [req.body.comment_id], (err, result2) => {
-    if (err) throw err;
-
-    console.log(result2);
+  connection.query(sql, [req.body.comment_id], (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send(err);
+      return;
+    }
 
     connection.query(
       sql2,

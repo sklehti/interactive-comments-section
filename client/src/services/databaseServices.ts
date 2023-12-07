@@ -6,23 +6,41 @@ const baseUrl = "http://localhost:3001/api/database";
 export const getAllUsers = () =>
   axios
     .get<UserInfo[]>(`${baseUrl}/allUsers`)
-    .then((response) => response.data);
+    .then((response) => response.data)
+    .catch(function (error) {
+      throw error;
+    });
 
 export const getComments = () =>
-  axios.get<Comments[]>(`${baseUrl}`).then((response) => response.data);
+  axios
+    .get<Comments[]>(`${baseUrl}`)
+    .then((response) => response.data)
+    .catch(function (error) {
+      throw error;
+    });
 
 export const getReplies = () =>
-  axios.get<Replies[]>(`${baseUrl}/replies`).then((response) => response.data);
+  axios
+    .get<Replies[]>(`${baseUrl}/replies`)
+    .then((response) => response.data)
+    .catch(function (error) {
+      throw error;
+    });
 
 export const scores = (scoreInfo: Score) =>
-  axios.post(`${baseUrl}/scores`, scoreInfo).then((response) => response.data);
+  axios
+    .post(`${baseUrl}/scores`, scoreInfo)
+    .then((response) => response.data)
+    .catch(function (error) {
+      throw error;
+    });
 
 export const createNewAdminComment = (newComment: Comment) =>
   axios
     .post(`${baseUrl}/newComment`, newComment)
     .then((response) => response.data)
     .catch(function (error) {
-      console.log(error);
+      throw error;
     });
 
 export const createComment = (comment: Replies) =>
@@ -30,7 +48,7 @@ export const createComment = (comment: Replies) =>
     .post(`${baseUrl}/replies`, comment)
     .then((response) => response.data)
     .catch(function (error) {
-      console.log(error);
+      throw error;
     });
 
 export const updateComment = (content: string, id: number) =>
@@ -38,7 +56,7 @@ export const updateComment = (content: string, id: number) =>
     .put(`${baseUrl}/updateComment`, { content, id })
     .then((response) => response.data)
     .catch(function (error) {
-      console.log(error);
+      throw error;
     });
 
 export const createScore = (newScore: Score) =>
@@ -46,7 +64,7 @@ export const createScore = (newScore: Score) =>
     .post(`${baseUrl}/addScore`, newScore)
     .then((response) => response.data)
     .catch(function (error) {
-      console.log(error);
+      throw error;
     });
 
 export const updateScore = (newScore: Score) =>
@@ -54,7 +72,7 @@ export const updateScore = (newScore: Score) =>
     .put(`${baseUrl}/removeScore`, newScore)
     .then((response) => response.data)
     .catch(function (error) {
-      console.log(error);
+      throw error;
     });
 
 export const updateReplies = (content: string, id: number) =>
@@ -62,11 +80,21 @@ export const updateReplies = (content: string, id: number) =>
     .put(`${baseUrl}/updateReplies`, { content, id })
     .then((response) => response.data)
     .catch(function (error) {
-      console.log(error);
+      throw error;
     });
 
 export const deleteReplies = (id: number) =>
-  axios.delete(`${baseUrl}/replies/${id}`).then((response) => response.data);
+  axios
+    .delete(`${baseUrl}/replies/${id}`)
+    .then((response) => response.data)
+    .catch(function (error) {
+      throw error;
+    });
 
 export const deleteComment = (id: number) =>
-  axios.delete(`${baseUrl}/comments/${id}`).then((response) => response.data);
+  axios
+    .delete(`${baseUrl}/comments/${id}`)
+    .then((response) => response.data)
+    .catch(function (error) {
+      throw error;
+    });

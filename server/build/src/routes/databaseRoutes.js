@@ -158,19 +158,25 @@ databaseRouter.put("/updateReplies", (req, res) => {
 // Delete comment from replies table
 databaseRouter.delete("/replies/:id", (req, res) => {
     const sql = "DELETE FROM replies WHERE id=?";
-    db_1.connection.query(sql, [req.params.id], (err) => {
-        if (err)
-            throw err;
-        res.send({ status: 200 });
+    db_1.connection.query(sql, [req.params.id], (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send(err);
+            return;
+        }
+        res.send(result);
     });
 });
 // Delete comment from replies table
 databaseRouter.delete("/comments/:id", (req, res) => {
     const sql = "DELETE FROM comments WHERE comment_id=?";
-    db_1.connection.query(sql, [req.params.id], (err) => {
-        if (err)
-            throw err;
-        res.send({ status: 200 });
+    db_1.connection.query(sql, [req.params.id], (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send(err);
+            return;
+        }
+        res.send(result);
     });
 });
 exports.default = databaseRouter;

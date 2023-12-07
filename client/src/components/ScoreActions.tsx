@@ -7,6 +7,7 @@ type Props = {
   currentUser: UserInfo | undefined;
   setAllComments: React.Dispatch<React.SetStateAction<Comments[]>>;
   setReplies: React.Dispatch<React.SetStateAction<Replies[]>>;
+  setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const ScoreActions = ({
@@ -14,6 +15,7 @@ const ScoreActions = ({
   currentUser,
   setAllComments,
   setReplies,
+  setErrorMessage,
 }: Props) => {
   return (
     <div className="score-layout">
@@ -28,6 +30,7 @@ const ScoreActions = ({
               setAllComments,
               setReplies,
               event,
+              setErrorMessage,
             })
           }
         >
@@ -44,6 +47,7 @@ const ScoreActions = ({
               setAllComments,
               setReplies,
               event,
+              setErrorMessage,
             })
           }
         >

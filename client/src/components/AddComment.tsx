@@ -7,6 +7,7 @@ import {
   getReplies,
 } from "../services/databaseServices";
 import { toNewReplies, toNewComment } from "../utils";
+import { parseError } from "./ErrorFunction";
 
 type Props = {
   currentUser: UserInfo | undefined;
@@ -19,6 +20,7 @@ type Props = {
   >;
   setAllComments: React.Dispatch<React.SetStateAction<Comments[]>>;
   setReplies: React.Dispatch<React.SetStateAction<Replies[]>>;
+  setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const AddComment = ({
@@ -30,6 +32,7 @@ const AddComment = ({
   setReplyForm,
   setAllComments,
   setReplies,
+  setErrorMessage,
 }: Props) => {
   const [text, setText] = useState("");
 
@@ -64,13 +67,25 @@ const AddComment = ({
 
           const newReply = toNewReplies(replies);
 
-          createComment(newReply).then((response) => {
-            console.log(response, "Reply created");
-
-            getReplies().then((response) => {
-              setReplies(response);
+          createComment(newReply)
+            .then(() => {
+              getReplies()
+                .then((response) => {
+                  setReplies(response);
+                })
+                .catch((error) => {
+                  setErrorMessage(parseError(error));
+                  setTimeout(() => {
+                    setErrorMessage("");
+                  }, 3000);
+                });
+            })
+            .catch((error) => {
+              setErrorMessage(parseError(error));
+              setTimeout(() => {
+                setErrorMessage("");
+              }, 3000);
             });
-          });
 
           // create comment by admin
         } else {
@@ -82,13 +97,25 @@ const AddComment = ({
 
           const newComment = toNewComment(createdComment);
 
-          createNewAdminComment(newComment).then((response) => {
-            console.log(response, "Reply created");
-
-            getComments().then((response) => {
-              setAllComments(response);
+          createNewAdminComment(newComment)
+            .then(() => {
+              getComments()
+                .then((response) => {
+                  setAllComments(response);
+                })
+                .catch((error) => {
+                  setErrorMessage(parseError(error));
+                  setTimeout(() => {
+                    setErrorMessage("");
+                  }, 3000);
+                });
+            })
+            .catch((error) => {
+              setErrorMessage(parseError(error));
+              setTimeout(() => {
+                setErrorMessage("");
+              }, 3000);
             });
-          });
         }
         setText("");
         setReplyForm({ username: "", command_id: -1 });

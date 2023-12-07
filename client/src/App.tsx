@@ -10,7 +10,7 @@ import {
 } from "./services/databaseServices";
 import AllComments from "./components/AllComments";
 import ErrorHandling from "./components/ErrorHandling";
-import axios, { AxiosError } from "axios";
+import { parseError } from "./components/ErrorFunction";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<UserInfo>();
@@ -25,60 +25,18 @@ function App() {
   const modal = document.getElementById("myModal");
 
   useEffect(() => {
-    getAllUsers()
-      .then((response) => {
-        setAllUser(response);
-
-        response.map((r) => {
+    Promise.all([getAllUsers(), getComments(), getReplies()])
+      .then(([users, comments, replies]) => {
+        users.map((r) => {
           return r.admin === 1 ? setCurrentUser(r) : "";
         });
-      })
-      .catch((error) => {
-        if (error.response) {
-          setErrorMessage(
-            "Data :" + error.response.data + "\n" + error.response.status
-          );
-        } else if (error.request) {
-          setErrorMessage("The request was made but no response was received");
-        } else {
-          setErrorMessage("Error: " + error.message);
-        }
-      });
 
-    getComments()
-      .then((response) => {
-        setAllComments(response);
+        setAllComments(comments);
+        setReplies(replies);
         setErrorMessage("");
       })
       .catch((error) => {
-        if (error.response) {
-          setErrorMessage(
-            "Data :" + error.response.data + "\n" + error.response.status
-          );
-        } else if (error.request) {
-          setErrorMessage("The request was made but no response was received");
-        } else {
-          setErrorMessage("Error: " + error.message);
-        }
-      });
-
-    getReplies()
-      .then((response) => {
-        setReplies(response);
-        setErrorMessage("");
-      })
-      .catch((error) => {
-        if (error.response) {
-          setErrorMessage(
-            "Data :" + error.response.data + "\n" + error.response.status
-          );
-        } else if (error.request) {
-          setErrorMessage(
-            "Error: The request was made but no response was received."
-          );
-        } else {
-          setErrorMessage("Error: " + error.message);
-        }
+        setErrorMessage(parseError(error));
       });
   }, [setAllUser, deleteCommentId, deleteId]);
 
@@ -90,14 +48,27 @@ function App() {
 
   const handleDelete = () => {
     if (deleteId > -1) {
-      deleteReplies(deleteId).then((result) => {
-        setDeleteId(-1);
-        console.log(result);
-      });
+      deleteReplies(deleteId)
+        .then(() => {
+          setDeleteId(-1);
+        })
+        .catch((error) => {
+          setErrorMessage(parseError(error));
+          setTimeout(() => {
+            setErrorMessage("");
+          }, 3000);
+        });
     } else if (deleteCommentId > -1) {
-      deleteComment(deleteCommentId).then(() => {
-        setDeleteCommentId(-1);
-      });
+      deleteComment(deleteCommentId)
+        .then(() => {
+          setDeleteCommentId(-1);
+        })
+        .catch((error) => {
+          setErrorMessage(parseError(error));
+          setTimeout(() => {
+            setErrorMessage("");
+          }, 3000);
+        });
     }
 
     if (modal) {
@@ -147,6 +118,7 @@ function App() {
             setReplies={setReplies}
             setDeleteCommentId={setDeleteCommentId}
             setDeleteId={setDeleteId}
+            setErrorMessage={setErrorMessage}
           />
         </>
       )}
