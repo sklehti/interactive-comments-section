@@ -1,4 +1,3 @@
-// NOTE! Maybe we don't need all these interfaces
 export interface AllUsers {
   id?: number;
   comments: Comments[];
@@ -10,30 +9,57 @@ export interface CurrentUser {
   username: string;
 }
 
-export interface Comments {
-  id: number;
+export interface Comment {
   content: string;
-  createdAt: string;
+  createdAt: Date;
+  user_id: number;
+}
+
+export interface Comments {
+  content: string;
+  createdAt: Date;
   score?: number;
-  user?: User;
-  replies: Replies[];
+  username: string;
+  image_png: string;
+  image_webp: string;
+  comment_id: number;
+  replies: number;
+}
+
+export interface UserInfo {
+  username: string;
+  image_png: string;
+  image_webp: string;
+  admin: number;
+  user_id: number;
 }
 
 export interface User {
   username: string;
   image?: Image;
 }
-
 export interface Image {
   png: string;
   webp: string;
 }
 
 export interface Replies {
-  id: number;
+  id?: number;
   content?: string;
   score?: number;
-  createdAt?: string;
-  user?: User;
+  createdAt?: Date;
+  user_id: number;
   replyingTo: string;
+  comment_id: number;
+  username: string;
+  image_png: string;
+  image_webp: string;
+  replyingToUserId?: number;
+}
+
+export interface Score {
+  id?: number;
+  comment_id: number;
+  user_id: number;
+  comment_type: string;
 }
