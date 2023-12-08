@@ -1,8 +1,7 @@
 import axios from "axios";
 import { Comments, Comment, Replies, UserInfo, Score } from "../types";
 
-// const baseUrl = "http://localhost:3001/api/database";
-const baseUrl = "/api/database";
+const baseUrl = "http://localhost:3001/api/database";
 
 export const getAllUsers = () =>
   axios

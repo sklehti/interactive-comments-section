@@ -1,5 +1,5 @@
 import express from "express";
-import { connection } from "../../config/db";
+import { pool } from "../../config/db";
 import { parseDate, toNewScore, toNewReplies, toNewComment } from "../utils";
 
 const databaseRouter = express.Router();
@@ -7,7 +7,7 @@ const databaseRouter = express.Router();
 databaseRouter.get("/allUsers", (_req, res) => {
   const sql = "SELECT * FROM users";
 
-  connection.query(sql, (err, result) => {
+  pool.query(sql, (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
@@ -22,7 +22,7 @@ databaseRouter.get("/", (_req, res) => {
   const sql =
     "SELECT * FROM users u, comments c WHERE u.user_id = c.user_id ORDER BY score DESC";
 
-  connection.query(sql, (err, result) => {
+  pool.query(sql, (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
@@ -36,7 +36,7 @@ databaseRouter.get("/", (_req, res) => {
 databaseRouter.get("/replies", (_req, res) => {
   const sql =
     "SELECT * FROM replies r, users u WHERE u.user_id = r.user_id ORDER BY CASE WHEN r.replyingToUserId > 0 THEN r.replyingToUserId ELSE r.id END ASC";
-  connection.query(sql, (err, result) => {
+  pool.query(sql, (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
@@ -52,7 +52,7 @@ databaseRouter.post("/replies", (req, res) => {
   const sql2 =
     "INSERT INTO replies (`content`, `createdAt`, `score`, `user_id`, `comment_id`, `replyingTo`, `replyingToUserId`) VALUES (?,?,?,?,?,?,?)";
 
-  connection.query(sql, req.body.comment_id, (err) => {
+  pool.query(sql, req.body.comment_id, (err) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
@@ -63,7 +63,7 @@ databaseRouter.post("/replies", (req, res) => {
     const newDate = parseDate(req.body.createdAt);
     const date2 = new Date(newDate);
 
-    connection.query(
+    pool.query(
       sql2,
       [
         newReply.content,
@@ -91,7 +91,7 @@ databaseRouter.post("/scores", (req, res) => {
   const sql =
     "SELECT * FROM scores WHERE comment_id=? AND user_id=? AND comment_type=?";
 
-  connection.query(
+  pool.query(
     sql,
     [req.body.comment_id, req.body.user_id, req.body.comment_type],
 
@@ -114,7 +114,7 @@ databaseRouter.post("/newComment", (req, res) => {
   const date2 = new Date(parseDate(req.body.createdAt));
   const newComment = toNewComment(req.body);
 
-  connection.query(
+  pool.query(
     sql,
     [newComment.content, date2.valueOf(), 0, newComment.user_id, 0],
     (err, result) => {
@@ -141,7 +141,7 @@ databaseRouter.post("/addScore", (req, res) => {
   const sql2 =
     "INSERT INTO scores (`comment_id`, `user_id`, `comment_type`) VALUES (?,?,?)";
 
-  connection.query(sql, [req.body.comment_id], (err) => {
+  pool.query(sql, [req.body.comment_id], (err) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
@@ -149,7 +149,7 @@ databaseRouter.post("/addScore", (req, res) => {
     }
     const newScore = toNewScore(req.body);
 
-    connection.query(
+    pool.query(
       sql2,
       [newScore.comment_id, newScore.user_id, newScore.comment_type],
       (err, result3) => {
@@ -177,7 +177,7 @@ databaseRouter.put("/removeScore", (req, res) => {
   const sql2 =
     "DELETE FROM scores WHERE comment_id=? AND user_id=? AND comment_type=?";
 
-  connection.query(sql, [req.body.comment_id], (err) => {
+  pool.query(sql, [req.body.comment_id], (err) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
@@ -186,7 +186,7 @@ databaseRouter.put("/removeScore", (req, res) => {
 
     const newScore = toNewScore(req.body);
 
-    connection.query(
+    pool.query(
       sql2,
       [newScore.comment_id, newScore.user_id, newScore.comment_type],
       (err, result3) => {
@@ -205,7 +205,7 @@ databaseRouter.put("/removeScore", (req, res) => {
 databaseRouter.put("/updateComment", (req, res) => {
   const sql = "UPDATE comments SET content=? WHERE comment_id=?";
 
-  connection.query(sql, [req.body.content, req.body.id], (err, result) => {
+  pool.query(sql, [req.body.content, req.body.id], (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
@@ -219,7 +219,7 @@ databaseRouter.put("/updateComment", (req, res) => {
 databaseRouter.put("/updateReplies", (req, res) => {
   const sql = "UPDATE replies SET content=? WHERE id=?";
 
-  connection.query(sql, [req.body.content, req.body.id], (err, result) => {
+  pool.query(sql, [req.body.content, req.body.id], (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
@@ -234,7 +234,7 @@ databaseRouter.put("/updateReplies", (req, res) => {
 databaseRouter.delete("/replies/:id", (req, res) => {
   const sql = "DELETE FROM replies WHERE id=?";
 
-  connection.query(sql, [req.params.id], (err, result) => {
+  pool.query(sql, [req.params.id], (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
@@ -249,7 +249,7 @@ databaseRouter.delete("/replies/:id", (req, res) => {
 databaseRouter.delete("/comments/:id", (req, res) => {
   const sql = "DELETE FROM comments WHERE comment_id=?";
 
-  connection.query(sql, [req.params.id], (err, result) => {
+  pool.query(sql, [req.params.id], (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).send(err);
