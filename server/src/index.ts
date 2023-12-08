@@ -7,7 +7,8 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static("./build"));
 
-const PORT = 3001;
+// const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.get("/ping", (_req, res) => {
   console.log("someone pinged here");
@@ -18,5 +19,5 @@ app.get("/ping", (_req, res) => {
 app.use("/api/database", databaseRouter);
 
 app.listen(PORT, () => {
-  console.log(`Server running on: http://localhost:${PORT}`);
+  console.log(`Server running on: port ${PORT}`);
 });

@@ -25,14 +25,43 @@ function App() {
   const modal = document.getElementById("myModal");
 
   useEffect(() => {
-    Promise.all([getAllUsers(), getComments(), getReplies()])
-      .then(([users, comments, replies]) => {
-        users.map((r) => {
+    // Promise.all([getAllUsers(), getComments(), getReplies()])
+    //   .then(([users, comments, replies]) => {
+    //     users.map((r) => {
+    //       return r.admin === 1 ? setCurrentUser(r) : "";
+    //     });
+
+    //     setAllComments(comments);
+    //     setReplies(replies);
+    //     setErrorMessage("");
+    //   })
+    //   .catch((error) => {
+    //     setErrorMessage(parseError(error));
+    //   });
+    getAllUsers()
+      .then((response) => {
+        setAllUser(response);
+
+        response.map((r) => {
           return r.admin === 1 ? setCurrentUser(r) : "";
         });
+      })
+      .catch((error) => {
+        setErrorMessage(parseError(error));
+      });
 
-        setAllComments(comments);
-        setReplies(replies);
+    getComments()
+      .then((response) => {
+        setAllComments(response);
+        setErrorMessage("");
+      })
+      .catch((error) => {
+        setErrorMessage(parseError(error));
+      });
+
+    getReplies()
+      .then((response) => {
+        setReplies(response);
         setErrorMessage("");
       })
       .catch((error) => {

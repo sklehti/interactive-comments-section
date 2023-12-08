@@ -19,7 +19,7 @@ databaseRouter.get("/allUsers", (_req, res) => {
     });
 });
 databaseRouter.get("/", (_req, res) => {
-    const sql = "SELECT * FROM users u, comments c WHERE u.user_id = c.user_id";
+    const sql = "SELECT * FROM users u, comments c WHERE u.user_id = c.user_id ORDER BY score DESC";
     db_1.connection.query(sql, (err, result) => {
         if (err) {
             console.error(err);

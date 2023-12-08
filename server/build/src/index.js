@@ -10,7 +10,8 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use(express_1.default.static("./build"));
-const PORT = 3001;
+// const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.get("/ping", (_req, res) => {
     console.log("someone pinged here");
     res.send("pong");
@@ -18,5 +19,5 @@ app.get("/ping", (_req, res) => {
 // get data from database
 app.use("/api/database", databaseRoutes_1.default);
 app.listen(PORT, () => {
-    console.log(`Server running on: http://localhost:${PORT}`);
+    console.log(`Server running on: port ${PORT}`);
 });
