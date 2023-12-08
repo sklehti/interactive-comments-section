@@ -10,11 +10,6 @@ app.use(express.static("./build"));
 // const PORT = 3001;
 const PORT = process.env.PORT || 3001;
 
-app.get("/ping", (_req, res) => {
-  console.log("someone pinged here");
-  res.send("pong");
-});
-
 // get data from database
 app.use("/api/database", databaseRouter);
 
