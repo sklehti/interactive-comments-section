@@ -9,6 +9,7 @@
 - Typescript
 - CSS
 - mySql
+- Socket.io
 - Heroku
 - Mobile-first workflow
 
