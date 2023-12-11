@@ -9,6 +9,7 @@ import {
 } from "../services/databaseServices";
 import { parseError } from "./ErrorFunction";
 import { toNewScore } from "../utils";
+import { Socket } from "socket.io-client";
 
 type Props = {
   reply: Replies | Comments;
@@ -17,6 +18,7 @@ type Props = {
   setReplies: React.Dispatch<React.SetStateAction<Replies[]>>;
   event: React.FormEvent<HTMLButtonElement>;
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
+  socket: Socket;
 };
 
 export const handlePlusScore = ({
@@ -26,6 +28,7 @@ export const handlePlusScore = ({
   setReplies,
   event,
   setErrorMessage,
+  socket,
 }: Props) => {
   let newScore: Score;
 
@@ -56,6 +59,10 @@ export const handlePlusScore = ({
               getComments()
                 .then((response) => {
                   setAllComments(response);
+
+                  socket.on("allComments", (data) => {
+                    setAllComments(data);
+                  });
                 })
                 .catch((error) => {
                   setErrorMessage(parseError(error));
@@ -67,6 +74,10 @@ export const handlePlusScore = ({
               getReplies()
                 .then((response) => {
                   setReplies(response);
+
+                  socket.on("allReplies", (data) => {
+                    setReplies(data);
+                  });
                 })
                 .catch((error) => {
                   setErrorMessage(parseError(error));
@@ -76,6 +87,10 @@ export const handlePlusScore = ({
                 });
             }
           });
+
+          return () => {
+            socket.disconnect();
+          };
         } else {
           alert("you have already given a point to a comment!");
         }
@@ -99,6 +114,7 @@ export const handleMinusScore = ({
   setReplies,
   event,
   setErrorMessage,
+  socket,
 }: Props) => {
   let score: Score;
 
@@ -130,6 +146,10 @@ export const handleMinusScore = ({
                 getComments()
                   .then((response) => {
                     setAllComments(response);
+
+                    socket.on("allComments", (data) => {
+                      setAllComments(data);
+                    });
                   })
                   .catch((error) => {
                     setErrorMessage(parseError(error));
@@ -141,6 +161,10 @@ export const handleMinusScore = ({
                 getReplies()
                   .then((response) => {
                     setReplies(response);
+
+                    socket.on("allReplies", (data) => {
+                      setReplies(data);
+                    });
                   })
                   .catch((error) => {
                     setErrorMessage(parseError(error));

@@ -11,6 +11,7 @@ import {
 import AllComments from "./components/AllComments";
 import ErrorHandling from "./components/ErrorHandling";
 import { parseError } from "./components/ErrorFunction";
+import socketIOClient, { Socket } from "socket.io-client";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<UserInfo>();
@@ -23,6 +24,11 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const modal = document.getElementById("myModal");
+
+  // const ENDPOINT = "http://localhost:3001";
+  const ENDPOINT =
+    "https://interactive-comments-section-4237c7a4f001.herokuapp.com/";
+  const socket: Socket = socketIOClient(ENDPOINT);
 
   useEffect(() => {
     Promise.all([getAllUsers(), getComments(), getReplies()])
@@ -51,6 +57,10 @@ function App() {
       deleteReplies(deleteId)
         .then(() => {
           setDeleteId(-1);
+
+          socket.on("allReplies", (data) => {
+            setReplies(data);
+          });
         })
         .catch((error) => {
           setErrorMessage(parseError(error));
@@ -62,6 +72,10 @@ function App() {
       deleteComment(deleteCommentId)
         .then(() => {
           setDeleteCommentId(-1);
+
+          socket.on("allComments", (data) => {
+            setAllComments(data);
+          });
         })
         .catch((error) => {
           setErrorMessage(parseError(error));
@@ -74,6 +88,10 @@ function App() {
     if (modal) {
       modal.style.display = "none";
     }
+
+    return () => {
+      socket.disconnect();
+    };
   };
 
   return (
@@ -119,6 +137,7 @@ function App() {
             setDeleteCommentId={setDeleteCommentId}
             setDeleteId={setDeleteId}
             setErrorMessage={setErrorMessage}
+            socket={socket}
           />
         </>
       )}

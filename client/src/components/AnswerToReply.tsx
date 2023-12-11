@@ -4,6 +4,7 @@ import replyIcon from "./images/icon-reply.svg";
 import editIcon from "./images/icon-edit.svg";
 import deleteIcon from "./images/icon-delete.svg";
 import { handleMinusScore, handlePlusScore } from "./ScoreFunctions";
+import { Socket } from "socket.io-client";
 
 type ReplyProps = {
   setReplyForm: React.Dispatch<
@@ -18,6 +19,7 @@ type ReplyProps = {
   setReplies: React.Dispatch<React.SetStateAction<Replies[]>>;
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
   setHasStartedTyping: React.Dispatch<React.SetStateAction<boolean>>;
+  socket: Socket;
 };
 
 const AnswerToReply = ({
@@ -31,6 +33,7 @@ const AnswerToReply = ({
   setReplies,
   setErrorMessage,
   setHasStartedTyping,
+  socket,
 }: ReplyProps) => {
   const handleDeleteModal = (reply: Replies | Comments) => {
     const modal = document.getElementById("myModal");
@@ -72,6 +75,7 @@ const AnswerToReply = ({
                 setReplies,
                 event,
                 setErrorMessage,
+                socket,
               })
             }
           >
@@ -90,6 +94,7 @@ const AnswerToReply = ({
                 setReplies,
                 event,
                 setErrorMessage,
+                socket,
               })
             }
           >

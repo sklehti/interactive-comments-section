@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Comments, Replies, UserInfo } from "../types";
 import AddComment from "./AddComment";
 import DaysFromWriting from "./DaysFromWriting";
@@ -11,6 +11,7 @@ import {
 import { parseError } from "./ErrorFunction";
 import AnswerToReply from "./AnswerToReply";
 import ScoreActions from "./ScoreActions";
+import { Socket } from "socket.io-client";
 
 type Props = {
   allComments: Comments[];
@@ -22,6 +23,7 @@ type Props = {
   setDeleteCommentId: React.Dispatch<React.SetStateAction<number>>;
   setDeleteId: React.Dispatch<React.SetStateAction<number>>;
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
+  socket: Socket;
 };
 
 const AllComments = ({
@@ -34,11 +36,26 @@ const AllComments = ({
   setDeleteCommentId,
   setDeleteId,
   setErrorMessage,
+  socket,
 }: Props) => {
   const [replyForm, setReplyForm] = useState({ username: "", command_id: -1 });
   const [editText, setEditText] = useState(-1);
   const [updateTextContent, setUpdateTextContent] = useState("");
   const [hasStartedTyping, setHasStartedTyping] = useState(false);
+
+  useEffect(() => {
+    socket.on("allComments", (data) => {
+      setAllComments(data);
+    });
+
+    socket.on("allReplies", (data) => {
+      setReplies(data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const handleUpdateContentSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -102,6 +119,7 @@ const AllComments = ({
                   setAllComments={setAllComments}
                   setReplies={setReplies}
                   setErrorMessage={setErrorMessage}
+                  socket={socket}
                 />
               </div>
 
@@ -139,6 +157,7 @@ const AllComments = ({
                       setReplies={setReplies}
                       setErrorMessage={setErrorMessage}
                       setHasStartedTyping={setHasStartedTyping}
+                      socket={socket}
                     />
                   </div>
                 </div>
@@ -181,6 +200,7 @@ const AllComments = ({
                 setReplies={setReplies}
                 setErrorMessage={setErrorMessage}
                 setHasStartedTyping={setHasStartedTyping}
+                socket={socket}
               />
             </div>
           </div>
@@ -197,6 +217,7 @@ const AllComments = ({
                 setReplies={setReplies}
                 replyingToUserId={0}
                 setErrorMessage={setErrorMessage}
+                socket={socket}
               />
             </div>
           ) : (
@@ -222,6 +243,7 @@ const AllComments = ({
                               setAllComments={setAllComments}
                               setReplies={setReplies}
                               setErrorMessage={setErrorMessage}
+                              socket={socket}
                             />
                           </div>
 
@@ -257,6 +279,7 @@ const AllComments = ({
                                   setReplies={setReplies}
                                   setErrorMessage={setErrorMessage}
                                   setHasStartedTyping={setHasStartedTyping}
+                                  socket={socket}
                                 />
                               </div>
                             </div>
@@ -313,6 +336,7 @@ const AllComments = ({
                             setReplies={setReplies}
                             setErrorMessage={setErrorMessage}
                             setHasStartedTyping={setHasStartedTyping}
+                            socket={socket}
                           />
                         </div>
                       </div>
@@ -334,6 +358,7 @@ const AllComments = ({
                           setReplies={setReplies}
                           replyingToUserId={r.id}
                           setErrorMessage={setErrorMessage}
+                          socket={socket}
                         />
                       </div>
                     ) : (
@@ -360,6 +385,7 @@ const AllComments = ({
           setReplies={setReplies}
           replyingToUserId={0}
           setErrorMessage={setErrorMessage}
+          socket={socket}
         />
       </div>
     </div>

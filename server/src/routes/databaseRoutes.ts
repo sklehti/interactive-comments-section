@@ -1,6 +1,7 @@
 import express from "express";
 import { pool } from "../../config/db";
 import { parseDate, toNewScore, toNewReplies, toNewComment } from "../utils";
+import { getIO } from "../socket";
 
 const databaseRouter = express.Router();
 
@@ -29,6 +30,8 @@ databaseRouter.get("/", (_req, res) => {
       return;
     }
 
+    const io = getIO();
+    io.emit("allComments", result);
     res.send(result);
   });
 });
@@ -43,6 +46,8 @@ databaseRouter.get("/replies", (_req, res) => {
       return;
     }
 
+    const io = getIO();
+    io.emit("allReplies", result);
     res.send(result);
   });
 });
@@ -121,8 +126,10 @@ databaseRouter.post("/newComment", (req, res) => {
       if (err) {
         console.error(err);
         res.status(500).send(err);
+
         return;
       }
+
       res.send(result);
     }
   );

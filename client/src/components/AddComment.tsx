@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UserInfo, Replies, Comments, Comment } from "../types";
 import {
   createComment,
@@ -8,6 +8,7 @@ import {
 } from "../services/databaseServices";
 import { toNewReplies, toNewComment } from "../utils";
 import { parseError } from "./ErrorFunction";
+import { Socket } from "socket.io-client";
 
 type Props = {
   currentUser: UserInfo | undefined;
@@ -21,6 +22,7 @@ type Props = {
   setAllComments: React.Dispatch<React.SetStateAction<Comments[]>>;
   setReplies: React.Dispatch<React.SetStateAction<Replies[]>>;
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
+  socket: Socket;
 };
 
 const AddComment = ({
@@ -33,8 +35,23 @@ const AddComment = ({
   setAllComments,
   setReplies,
   setErrorMessage,
+  socket,
 }: Props) => {
   const [text, setText] = useState("");
+
+  useEffect(() => {
+    socket.on("allComments", (data) => {
+      setAllComments(data);
+    });
+
+    socket.on("allReplies", (data) => {
+      setReplies(data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const handleCommentForm = (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -117,6 +134,7 @@ const AddComment = ({
               }, 3000);
             });
         }
+
         setText("");
         setReplyForm({ username: "", command_id: -1 });
       }

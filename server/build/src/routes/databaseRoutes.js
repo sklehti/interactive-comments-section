@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = require("../../config/db");
 const utils_1 = require("../utils");
+const socket_1 = require("../socket");
 const databaseRouter = express_1.default.Router();
 databaseRouter.get("/allUsers", (_req, res) => {
     const sql = "SELECT * FROM users";
@@ -26,6 +27,8 @@ databaseRouter.get("/", (_req, res) => {
             res.status(500).send(err);
             return;
         }
+        const io = (0, socket_1.getIO)();
+        io.emit("allComments", result);
         res.send(result);
     });
 });
@@ -37,6 +40,8 @@ databaseRouter.get("/replies", (_req, res) => {
             res.status(500).send(err);
             return;
         }
+        const io = (0, socket_1.getIO)();
+        io.emit("allReplies", result);
         res.send(result);
     });
 });
