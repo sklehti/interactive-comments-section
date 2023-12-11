@@ -28,3 +28,4 @@
 - A confirmation modal should pop up before a comment or reply is deleted.
 - Adding a new comment or reply uses the `currentUser` object from the database.
 - You can only edit or delete your own (`currentUser`) comments and replies.
+- all changes occur on all users' pages at the same time
