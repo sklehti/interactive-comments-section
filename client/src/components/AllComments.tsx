@@ -60,38 +60,19 @@ const AllComments = ({
   const handleUpdateContentSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    updateComment(updateTextContent, editText)
-      .then(() => {
-        getComments()
-          .then((response) => {
-            setAllComments(response);
-          })
-          .catch((error) => {
-            setErrorMessage(parseError(error));
-            setTimeout(() => {
-              setErrorMessage("");
-            }, 3000);
-          });
-      })
-      .catch((error) => {
-        setErrorMessage(parseError(error));
-        setTimeout(() => {
-          setErrorMessage("");
-        }, 3000);
-      });
-
-    setEditText(-1);
-    setUpdateTextContent("");
-    setHasStartedTyping(false);
-  };
-
-  const handleReplySubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-
-    updateReplies(updateTextContent, editText).then(() => {
-      getReplies()
-        .then((response) => {
-          setReplies(response);
+    if (updateTextContent.length > 0) {
+      updateComment(updateTextContent, editText)
+        .then(() => {
+          getComments()
+            .then((response) => {
+              setAllComments(response);
+            })
+            .catch((error) => {
+              setErrorMessage(parseError(error));
+              setTimeout(() => {
+                setErrorMessage("");
+              }, 3000);
+            });
         })
         .catch((error) => {
           setErrorMessage(parseError(error));
@@ -99,11 +80,38 @@ const AllComments = ({
             setErrorMessage("");
           }, 3000);
         });
-    });
 
-    setEditText(-1);
-    setUpdateTextContent("");
-    setHasStartedTyping(false);
+      setEditText(-1);
+      setUpdateTextContent("");
+      setHasStartedTyping(false);
+    } else {
+      alert("Content has not been modified or is empty!");
+    }
+  };
+
+  const handleReplySubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+
+    if (updateTextContent.length > 0) {
+      updateReplies(updateTextContent, editText).then(() => {
+        getReplies()
+          .then((response) => {
+            setReplies(response);
+          })
+          .catch((error) => {
+            setErrorMessage(parseError(error));
+            setTimeout(() => {
+              setErrorMessage("");
+            }, 3000);
+          });
+      });
+
+      setEditText(-1);
+      setUpdateTextContent("");
+      setHasStartedTyping(false);
+    } else {
+      alert("Content has not been modified or is empty!");
+    }
   };
 
   return (
