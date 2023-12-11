@@ -1,5 +1,7 @@
 # Frontend Mentor - Interactive comments section
 
+- Coding challenge on the page: https://www.frontendmentor.io/challenges/interactive-comments-section-iG1RugEG9
+
 ## Built with
 
 - [React](https://reactjs.org/)
